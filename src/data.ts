@@ -1,6 +1,4 @@
-import { ReactNode } from "react";
 import { Element as SlateElement } from "slate"
-import { RenderElementProps } from "slate-react";
 
 export type FileSegment = {
     readonly begin: number;
@@ -13,6 +11,17 @@ export type FileSegment = {
     }[];
 };
 
-export function toParagraph(segment: FileSegment): SlateElement {
-    return null as any;
+export type Element = SlateElement & {
+    readonly begin: number;
+    readonly end: number;
+};
+
+export function toElement(segment: FileSegment): Element {
+    return {
+        begin: segment.begin,
+        end: segment.end,
+        children: [{
+            text: segment.text,
+        }],
+    };
 }

@@ -1,8 +1,10 @@
-import React from "react";
-import styles from "./Editor.module.css"
+import recordSRT from "../../data/record.srt.json";
+import React, { useState } from "react";
+import styles from "./Editor.module.css";
 
-import { createEditor } from "slate"
-import { Slate, Editable, withReact, RenderElementProps } from "slate-react"
+import { createEditor } from "slate";
+import { Slate, Editable, withReact, RenderElementProps } from "slate-react";
+import { toElement } from "../data";
 import { ElementView } from "./Element";
 
 const Editor = () => {
@@ -10,20 +12,12 @@ const Editor = () => {
     const renderElement = React.useCallback(
         (props: RenderElementProps) => <ElementView {...props}/>,
         [],
-);
-    const initialValue = [
-        {
-            type: "paragraph",
-            children: [
-                { text: "This is editable plain text, just like a <textarea>!" },
-            ],
-        },
-    ]
+    );
     return (
         <div className={styles.container}>
             <Slate
                 editor={editor}
-                initialValue={initialValue}>
+                initialValue={recordSRT.map(toElement)}>
                 <Editable
                     renderElement={renderElement}
                     placeholder="Enter some plain text..." />

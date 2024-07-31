@@ -1,0 +1,40 @@
+.container {
+    padding: 10px 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+
+    > * {
+        flex-grow: 1;
+    }
+}
+
+.head {
+    display: flex;
+    flex-grow: 0;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    flex-basis: 120px;
+    user-select: none;
+    margin-right: 20px;
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 8px;
+    width: 24px;
+    height: 24px;
+}
+
+.timestamp {
+    display: flex;
+    font-size: 10px;
+    color: dimgrey;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
