@@ -1,0 +1,12 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+    align-items: stretch;
+    width: 100%;
+
+    > div {
+        outline: none;
+        flex-grow: 1;
+    }
+}
