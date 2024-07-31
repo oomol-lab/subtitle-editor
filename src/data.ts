@@ -1,4 +1,5 @@
 import { Text, Element as SlateElement } from "slate"
+import { val, Val } from "value-enhancer";
 
 export type FileSegment = {
     readonly begin: number;
@@ -17,6 +18,7 @@ export type Element = SlateElement & {
 };
 
 export type Leaf = Text & ({} | {
+    readonly selected$: Val<boolean>;
     readonly begin: number;
     readonly end: number;
 });
@@ -42,7 +44,7 @@ export function toElement({ begin, end, text, words }: FileSegment): Element {
             if (plainText.length > 0) {
                 leaves.push({ text: plainText.splice(0).join("") });
             }
-            leaves.push({ begin, end, text: word });
+            leaves.push({ begin, end, text: word, selected$: val(false) });
         } else {
             plainText.push(text[textIndex]);
             wordIndex += 1;

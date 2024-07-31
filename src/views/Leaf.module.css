@@ -2,3 +2,8 @@ span.mark {
     font-size: 20px;
     color: black;
 }
+
+span.mark_selected {
+    color: red;
+    text-decoration: underline;
+}
