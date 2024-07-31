@@ -1,4 +1,4 @@
-import { Element as SlateElement } from "slate"
+import { Text, Element as SlateElement } from "slate"
 
 export type FileSegment = {
     readonly begin: number;
@@ -16,12 +16,44 @@ export type Element = SlateElement & {
     readonly end: number;
 };
 
-export function toElement(segment: FileSegment): Element {
+export type Leaf = Text & ({} | {
+    readonly begin: number;
+    readonly end: number;
+});
+
+export function toElement({ begin, end, text, words }: FileSegment): Element {
+    let textIndex = 0;
+    const leaves: Leaf[] = [];
+    const plainText: string[] = [];
+
+    for (const { begin, end, word } of words) {
+        let wordIndex = 0;
+        let wordMatches = false;
+
+        while (text[textIndex] === word[wordIndex]) {
+            textIndex += 1;
+            wordIndex += 1;
+            if (wordIndex >= word.length) {
+                wordMatches = true;
+                break;
+            }
+        }
+        if (wordMatches) {
+            if (plainText.length > 0) {
+                leaves.push({ text: plainText.splice(0).join("") });
+            }
+            leaves.push({ begin, end, text: word });
+        } else {
+            plainText.push(text[textIndex]);
+            wordIndex += 1;
+        }
+    }
+    if (plainText.length > 0) {
+        leaves.push({ text: plainText.splice(0).join("") });
+    }
     return {
-        begin: segment.begin,
-        end: segment.end,
-        children: [{
-            text: segment.text,
-        }],
+        begin,
+        end,
+        children: leaves,
     };
 }

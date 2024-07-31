@@ -10,6 +10,11 @@
     }
 }
 
+.content {
+    font-size: 18px;
+    color: dimgray;
+}
+
 .head {
     display: flex;
     flex-grow: 0;

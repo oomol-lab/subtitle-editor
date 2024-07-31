@@ -20,7 +20,9 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
                 begin={element.begin}
                 end={element.end}
                 showButton={isHover}/>
-            {children}
+            <div className={styles.content}>
+                {children}
+            </div>
         </div>
     );
 };
