@@ -12,18 +12,14 @@ export type FileSegment = {
     }[];
 };
 
-export type Element = SlateElement & {
-    readonly begin: number;
-    readonly end: number;
-};
-
+export type Element = SlateElement;
 export type Leaf = Text & ({} | {
     readonly selected$: Val<boolean>;
     readonly begin: number;
     readonly end: number;
 });
 
-export function toElement({ begin, end, text, words }: FileSegment): Element {
+export function toElement({ text, words }: FileSegment): Element {
     let textIndex = 0;
     const leaves: Leaf[] = [];
     const plainText: string[] = [];
@@ -53,9 +49,5 @@ export function toElement({ begin, end, text, words }: FileSegment): Element {
     if (plainText.length > 0) {
         leaves.push({ text: plainText.splice(0).join("") });
     }
-    return {
-        begin,
-        end,
-        children: leaves,
-    };
+    return { children: leaves };
 }

@@ -3,7 +3,7 @@ import React from "react";
 
 import { CaretRightOutlined } from "@ant-design/icons";
 import { RenderElementProps } from "slate-react";
-import { Element } from "../data";
+import { Element, Leaf } from "../data";
 
 export const ElementView = (props: RenderElementProps): React.ReactNode => {
     const { attributes, children } = props;
@@ -11,14 +11,24 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
     const [isHover, setHover] = React.useState(false);
     const onMouseEnter = React.useCallback(() => setHover(true), [setHover]);
     const onMouseLeave = React.useCallback(() => setHover(false), [setHover]);
+    let begin = Number.MAX_SAFE_INTEGER;
+    let end = Number.MIN_SAFE_INTEGER;
+
+    for (const child of element.children) {
+        const leaf = (child as Leaf);
+        if ("selected$" in leaf) {
+            begin = Math.min(begin, leaf.begin);
+            end = Math.max(end, leaf.end);
+        }
+    }
     return (
         <div {...attributes}
             className={styles.container}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}>
             <Head
-                begin={element.begin}
-                end={element.end}
+                begin={begin}
+                end={end}
                 showButton={isHover}/>
             <div className={styles.content}>
                 {children}
@@ -52,6 +62,10 @@ const Head = ({ begin, end, showButton }: HeadProps): React.ReactNode => {
 };
 
 function formatTimestamp(milliseconds: number): string {
+    if (milliseconds === Number.MAX_SAFE_INTEGER ||
+        milliseconds === Number.MIN_SAFE_INTEGER) {
+        return "";
+    }
     const hours = Math.floor(milliseconds / (1000 * 60 * 60));
     const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000);

@@ -8,7 +8,6 @@ export class State {
 
     #lastAnchor: Point | null = null;
     #lastSelected$: Val<boolean> | null = null;
-    #lastSelectedNode: Leaf | null = null;
 
     public constructor(editor: Editor) {
         const protoApply = editor.apply;
@@ -77,12 +76,10 @@ export class State {
                 selected$.set(true);
                 this.#lastSelected$?.set(false);
                 this.#lastSelected$ = selected$;
-                this.#lastSelectedNode = node;
             }
         } else if (this.#lastSelected$) {
             this.#lastSelected$.set(false);
             this.#lastSelected$ = null;
-            this.#lastSelectedNode = null;
         }
     }
 
