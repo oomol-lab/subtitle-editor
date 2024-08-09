@@ -3,6 +3,7 @@ import styles from "./Header.module.css";
 import cls from "classnames";
 import WavesurferView, { WavesurferInstances } from "./WavesurferView";
 
+import { useVal } from "use-value-enhancer";
 import { State } from "../state";
 
 export type HeaderProps = React.HTMLAttributes<HTMLDivElement> & {
@@ -11,12 +12,15 @@ export type HeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 
 const Header = (props: HeaderProps) => {
     const { state } = props;
-    const { regionsHub } = state;
     const [_, setInstances] = React.useState<WavesurferInstances | null>(null);
+    const zoom = useVal(state.zoom$);
     const onFirstDecode = React.useCallback(({ wavesurfer, regions }: WavesurferInstances) => {
-        wavesurfer.zoom(50);
+        const { regionsHub } = state;
+        wavesurfer.zoom(zoom);
+        state.bindWaveSurfer(wavesurfer);
         regionsHub.bindRegions(regions);
-    }, [regionsHub]);
+    }, [state, zoom]);
+
     return (
         <header
             {...props}

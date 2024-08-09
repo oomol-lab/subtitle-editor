@@ -3,7 +3,7 @@ import React from "react";
 
 import { CaretRightOutlined } from "@ant-design/icons";
 import { RenderElementProps } from "slate-react";
-import { Element, Leaf } from "../data";
+import { Element, isTsLeaf, Leaf } from "../data";
 
 export const ElementView = (props: RenderElementProps): React.ReactNode => {
     const { attributes, children } = props;
@@ -15,10 +15,9 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
     let end = Number.MIN_SAFE_INTEGER;
 
     for (const child of element.children) {
-        const leaf = (child as Leaf);
-        if ("selected$" in leaf) {
-            begin = Math.min(begin, leaf.begin);
-            end = Math.max(end, leaf.end);
+        if (isTsLeaf(child)) {
+            begin = Math.min(begin, child.begin);
+            end = Math.max(end, child.end);
         }
     }
     return (

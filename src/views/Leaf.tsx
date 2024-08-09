@@ -5,12 +5,12 @@ import cls from "classnames";
 import { Val } from "value-enhancer";
 import { useVal } from "use-value-enhancer";
 import { RenderLeafProps } from "slate-react";
-import { Leaf } from "../data";
+import { isTsLeaf, Leaf } from "../data";
 
 export const LeafView = (props: RenderLeafProps): React.ReactNode => {
     const { attributes, children } = props;
-    const leaf = props.leaf as Leaf;
-    if ("selected$" in leaf) {
+    const leaf = props.leaf;
+    if (isTsLeaf(leaf)) {
         return (
             <MarkLeafView
                 attributes={attributes}

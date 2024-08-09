@@ -2,6 +2,7 @@ import { Editor, Descendant } from "slate";
 import { val, Val } from "value-enhancer";
 import { Region, Regions } from "wavesurfer.js/dist/plugins/regions.esm.js";
 import { isElement, Element, isElementHasTimestamp, beginAndEnd } from "./data";
+import { toSeconds } from "./utils";
 
 type Line = {
     readonly id: number;
@@ -9,6 +10,9 @@ type Line = {
     region: Region | null;
     children: Descendant[];
 };
+
+const RegionColor = "rgba(255, 125, 125, 0.1)";
+const RegionSelectedColor = "rgba(255, 65, 65, 0.2)";
 
 // to see: https://wavesurfer.xyz/examples/?regions.js
 // source code: https://github.com/katspaugh/wavesurfer.js/blob/main/src/plugins/regions.ts
@@ -57,8 +61,8 @@ export class RegionsHub {
                 if (isElementHasTimestamp(child)) {
                     if (region) {
                         const [begin, endAt] = beginAndEnd(child.children);
-                        const start = this.#toSeconds(begin);
-                        const end = this.#toSeconds(endAt);
+                        const start = toSeconds(begin);
+                        const end = toSeconds(endAt);
                         if (region.start !== start || region.end !== end) {
                             region.setOptions({ start, end });
                         }
@@ -93,6 +97,7 @@ export class RegionsHub {
 
     #createRegionByChild(id: number, child: Element, textVal: Val<string>): Region {
         const textDom = document.createElement("div");
+        const selected$ = child.selected$;
         const [begin, end] = beginAndEnd(child.children);
 
         textVal.subscribe(text => {
@@ -109,15 +114,21 @@ export class RegionsHub {
         textDom.style.textOverflow = "ellipsis";
         textDom.style.marginRight = "1px";
 
-        return this.#regions!.addRegion({
+        const region = this.#regions!.addRegion({
             id: `${id}`,
-            start: this.#toSeconds(begin),
-            end: this.#toSeconds(end),
+            start: toSeconds(begin),
+            end: toSeconds(end),
             content: textDom,
-            color: "rgba(255, 0, 0, 0.1)",
+            color: selected$.value ? RegionSelectedColor : RegionColor,
             drag: false,
             resize: false,
-        })
+        });
+        selected$.reaction(selected => {
+            region.setOptions({
+                color: selected ? RegionSelectedColor : RegionColor,
+            } as any);
+        });
+        return region;
     }
 
     #getTextOfChildren(children: Descendant[]): string {
@@ -132,9 +143,5 @@ export class RegionsHub {
 
     #generateId(): number {
         return this.#nextId ++;
-    }
-
-    #toSeconds(milliseconds: number): number {
-        return milliseconds / 1000.0;
     }
 }
