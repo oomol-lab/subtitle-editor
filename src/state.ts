@@ -1,6 +1,6 @@
 import { Val } from "value-enhancer";
-import { Point, Location, Range, Editor, Operation, Span, SelectionMode, SetSelectionOperation } from "slate";
-import { Leaf } from "./data";
+import { Node, Path, Point, Location, Range, Editor, Operation, Span, SelectionMode, SetSelectionOperation, SplitNodeOperation, Descendant, MergeNodeOperation } from "slate";
+import { isElement, isLeaf, Leaf, splitElement, splitLeaf } from "./data";
 import { RegionsHub } from "./regionsHub";
 
 export class State {
@@ -10,6 +10,8 @@ export class State {
 
     #lastAnchor: Point | null = null;
     #lastSelected$: Val<boolean> | null = null;
+    #lastLeafPosition: number = -1;
+    #waitSplitLeafs: [Leaf, Leaf] | null = null;
 
     public constructor(editor: Editor) {
         const protoApply = editor.apply;
@@ -23,13 +25,68 @@ export class State {
     }
 
     #injectApply(protoApply: Editor["apply"], operation: Operation): void {
-        protoApply(operation);
         switch (operation.type) {
+            case "split_node": {
+                this.#splitNode(operation);
+                break;
+            }
             case "set_selection": {
+                protoApply(operation);
                 this.#onSelectionChange(operation);
                 break;
             }
+            default: {
+                protoApply(operation);
+                break;
+            }
         }
+    }
+
+    #splitNode({ path, position }: SplitNodeOperation): void {
+        if (path.length === 0) {
+            return;
+        }
+        const editor = this.#editor;
+        const node = Node.get(editor, path);
+
+        if (isLeaf(node)) {
+            this.#lastLeafPosition = position;
+            if (position > 0 && position < node.text.length) {
+                // cannot split on this tick or fail.
+                // I don't know why, but it works.
+                this.#waitSplitLeafs = splitLeaf(node, position);
+                setTimeout(() => this.#waitSplitLeafs = null, 0);
+            }
+        } else if (isElement(node)) {
+            if (position === 1 && this.#lastLeafPosition === 0) {
+                // to fix cannot press enter at the beginning of the line.
+                // I don't know why, but it works.
+                position = 0;
+            }
+            const [left, right] = splitElement(node, position);
+            const nextPath = this.#nextPath(path);
+
+            if (this.#waitSplitLeafs) {
+                const [leftLeaf, rightLeaf] = this.#waitSplitLeafs;
+                left.children[left.children.length - 1] = leftLeaf;
+                right.children.unshift(rightLeaf);
+            }
+            Promise.resolve().then(() => {
+                editor.removeNodes({ at: path });
+                editor.insertNodes(left, { at: path });
+                editor.insertNodes(right, { at: nextPath });
+                editor.select({
+                    path: editor.first(nextPath)[1],
+                    offset: 0,
+                });
+            });
+        }
+    }
+
+    #nextPath(path: Path): Path {
+        const nextPath = [...path];
+        nextPath[nextPath.length - 1] += 1;
+        return nextPath;
     }
 
     #onSelectionChange(operation: SetSelectionOperation): void {
@@ -74,17 +131,19 @@ export class State {
     }
 
     #chooseSelectedNode(node: Leaf | null): void {
+        let cleanLastSelected = true;
         if (node) {
             const selected$ = (node as any).selected$;
-            if (!selected$) {
-                throw new Error("node is invalid leaf");
+            if (selected$) {
+                if (selected$ !== this.#lastSelected$) {
+                    selected$.set(true);
+                    this.#lastSelected$?.set(false);
+                    this.#lastSelected$ = selected$;
+                }
+                cleanLastSelected = false;
             }
-            if (selected$ !== this.#lastSelected$) {
-                selected$.set(true);
-                this.#lastSelected$?.set(false);
-                this.#lastSelected$ = selected$;
-            }
-        } else if (this.#lastSelected$) {
+        }
+        if (cleanLastSelected && this.#lastSelected$) {
             this.#lastSelected$.set(false);
             this.#lastSelected$ = null;
         }
