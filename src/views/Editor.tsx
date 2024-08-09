@@ -3,16 +3,19 @@ import React from "react";
 import cls from "classnames";
 import styles from "./Editor.module.css";
 
-import { createEditor } from "slate";
-import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps } from "slate-react";
-import { Leaf, toElement } from "../data";
+import { Slate, Editable, ReactEditor, RenderElementProps, RenderLeafProps } from "slate-react";
+import { toElement } from "../data";
 import { State } from "../state";
 import { ElementView } from "./Element";
 import { LeafView } from "./Leaf";
 
-const Editor = (props: React.HTMLAttributes<HTMLDivElement>) => {
-    const editor = React.useMemo(() => withReact(createEditor()), []);
-    const state = React.useMemo(() => new State(editor), [editor]);
+export type EditorProps = React.HTMLAttributes<HTMLDivElement> & {
+    readonly editor: ReactEditor;
+    readonly state: State;
+};
+
+const Editor = (props: EditorProps) => {
+    const { editor } = props;
     const renderElement = React.useCallback(
         (props: RenderElementProps) => <ElementView {...props}/>,
         [],

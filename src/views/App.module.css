@@ -1,8 +1,18 @@
 .container {
+    overflow: hidden;
     display: flex;
-    flex-direction: row;
-    justify-content: stretch;
-    align-items: stretch;
-    width: 100% - 56px;
-    margin: 28px;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.header {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 28px 10px;
 }

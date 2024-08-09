@@ -29,11 +29,11 @@ dependencies:
   value-enhancer:
     specifier: ^5.4.2
     version: 5.4.6
+  wavesurfer.js:
+    specifier: ^7.8.2
+    version: 7.8.2
 
 devDependencies:
-  '@types/classnames':
-    specifier: ^2.3.1
-    version: 2.3.1
   '@types/node':
     specifier: ^20.12.7
     version: 20.14.13
@@ -451,13 +451,6 @@ packages:
     dev: true
     optional: true
 
-  /@types/classnames@2.3.1:
-    resolution: {integrity: sha512-zeOWb0JGBoVmlQoznvqXbE0tEC/HONsnoUNH19Hc96NFsTAwTXbTqb8FMYkru1F/iqp7a18Ws3nWJvtA1sHD1A==}
-    deprecated: This is a stub types definition. classnames provides its own type definitions, so you do not need this installed.
-    dependencies:
-      classnames: 2.5.1
-    dev: true
-
   /@types/estree@1.0.5:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
     dev: true
@@ -495,6 +488,7 @@ packages:
 
   /classnames@2.5.1:
     resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
+    dev: false
 
   /compute-scroll-into-view@3.1.0:
     resolution: {integrity: sha512-rj8l8pD4bJ1nx+dAkMhV1xB5RuZEyVysfxJqB1pRchh1KVvwOv9b7CGB8ZfjTImVv2oF+sYMUkMZq6Na5Ftmbg==}
@@ -810,3 +804,7 @@ packages:
     optionalDependencies:
       fsevents: 2.3.3
     dev: true
+
+  /wavesurfer.js@7.8.2:
+    resolution: {integrity: sha512-tcQrhtILu7lOy4ZkfkqFjjv+fK4dDVNoEF4vh79W5RtkLjByCt7jqcneEG1lf+6XMBXyWE5AHQ8bAE/Ch4HdtQ==}
+    dev: false

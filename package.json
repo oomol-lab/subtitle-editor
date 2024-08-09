@@ -6,7 +6,6 @@
     "dev": "vite --open --host"
   },
   "devDependencies": {
-    "@types/classnames": "^2.3.1",
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
@@ -22,6 +21,7 @@
     "slate": "^0.103.0",
     "slate-react": "^0.107.1",
     "use-value-enhancer": "^5.0.6",
-    "value-enhancer": "^5.4.2"
+    "value-enhancer": "^5.4.2",
+    "wavesurfer.js": "^7.8.2"
   }
 }
