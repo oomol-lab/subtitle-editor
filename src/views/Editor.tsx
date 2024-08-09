@@ -8,6 +8,7 @@ import { toElement } from "../data";
 import { State } from "../state";
 import { ElementView } from "./Element";
 import { LeafView } from "./Leaf";
+import { Descendant } from "slate";
 
 export type EditorProps = React.HTMLAttributes<HTMLDivElement> & {
     readonly editor: ReactEditor;
@@ -15,7 +16,7 @@ export type EditorProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 const Editor = (props: EditorProps) => {
-    const { editor } = props;
+    const { editor, state: { regionsHub } } = props;
     const renderElement = React.useCallback(
         (props: RenderElementProps) => <ElementView {...props}/>,
         [],
@@ -24,11 +25,16 @@ const Editor = (props: EditorProps) => {
         (props: RenderLeafProps) => <LeafView {...props} />,
         [],
     );
+    const onValueChange = React.useCallback(
+        (value: Descendant[]) => regionsHub.updateEditorValue(value),
+        [regionsHub],
+    );
     return (
         <div {...props}
             className={cls(styles.container, props.className)}>
             <Slate
                 editor={editor}
+                onValueChange={onValueChange}
                 initialValue={recordSRT.map(toElement)}>
                 <Editable
                     renderElement={renderElement}

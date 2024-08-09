@@ -1,8 +1,7 @@
 import React from "react";
 import styles from "./Header.module.css";
 import cls from "classnames";
-import WaveSurfer from "wavesurfer.js";
-import WavesurferView from "./WavesurferView";
+import WavesurferView, { WavesurferInstances } from "./WavesurferView";
 
 import { State } from "../state";
 
@@ -11,20 +10,21 @@ export type HeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 const Header = (props: HeaderProps) => {
-    const [wavesurfer, setWavesurfer] = React.useState<WaveSurfer | null>(null);
-    const onInitWavesurfer = React.useCallback((wavesurfer: WaveSurfer) => {
-        setWavesurfer(wavesurfer);
-        wavesurfer.on("decode", () => {
-
-        });
-     }, [setWavesurfer]);
+    const { state } = props;
+    const { regionsHub } = state;
+    const [_, setInstances] = React.useState<WavesurferInstances | null>(null);
+    const onFirstDecode = React.useCallback(({ wavesurfer, regions }: WavesurferInstances) => {
+        wavesurfer.zoom(50);
+        regionsHub.bindRegions(regions);
+    }, [regionsHub]);
     return (
         <header
             {...props}
             className={cls(props.className, styles.container)}>
             <WavesurferView
                 url="/data/Record.wav"
-                initWavesurfer={onInitWavesurfer}/>
+                initWavesurfer={setInstances}
+                firstDecode={onFirstDecode}/>
         </header>
     );
 };

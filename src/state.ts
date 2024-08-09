@@ -1,10 +1,12 @@
 import { Val } from "value-enhancer";
 import { Point, Location, Range, Editor, Operation, Span, SelectionMode, SetSelectionOperation } from "slate";
 import { Leaf } from "./data";
+import { RegionsHub } from "./regionsHub";
 
 export class State {
 
     readonly #editor: Editor;
+    readonly #regionsHub: RegionsHub;
 
     #lastAnchor: Point | null = null;
     #lastSelected$: Val<boolean> | null = null;
@@ -13,6 +15,11 @@ export class State {
         const protoApply = editor.apply;
         this.#editor = editor;
         editor.apply = operation => this.#injectApply(protoApply, operation);
+        this.#regionsHub = new RegionsHub(editor);
+    }
+
+    public get regionsHub(): RegionsHub {
+        return this.#regionsHub;
     }
 
     #injectApply(protoApply: Editor["apply"], operation: Operation): void {

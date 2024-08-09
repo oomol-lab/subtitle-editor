@@ -16,5 +16,6 @@
     "resolveJsonModule": true,
     "lib": ["DOM", "ESNext"]
   },
-  "include": ["src/**/*", "dev/**/*"]
+
+  "include": ["src/**/*", "dev/**/*", "typings/**/*"],
 }
