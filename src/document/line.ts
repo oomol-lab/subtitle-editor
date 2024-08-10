@@ -47,6 +47,10 @@ export class Line {
         });
     }
 
+    public static empty(): Line {
+        return new Line(Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER, []);
+    }
+
     public static get(node: Node): Line | null {
         const instance = (node as any as Record<string, unknown>).ins;
         if (instance instanceof Line) {
@@ -86,7 +90,7 @@ export class Line {
             children: leftChildren,
         };
         const right: LineElement = {
-            ins: new Line(rightBegin, rightEnd, leftChildren),
+            ins: new Line(rightBegin, rightEnd, rightChildren),
             children: rightChildren,
         };
         return [left, right];
@@ -98,6 +102,22 @@ export class Line {
 
     public fireRemoved(): void {
         this.#removed$.set(true);
+    }
+
+    public checkIsLastWord(word: string): boolean {
+        const children = this.#children$.value;
+        if (children.length > 1) {
+            return false;
+        }
+        if (children.length === 0) {
+            return true;
+        }
+        const child = children[0];
+
+        if (!("text" in child)) {
+            return true;
+        }
+        return child.text.length === word.length;
     }
 
     public fireChildrenMaybeChanged(children: Descendant[]): void {

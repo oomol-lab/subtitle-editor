@@ -3,7 +3,7 @@ import slate, { Editor, Point, Node, Range, Span, Text, Path } from "slate";
 import { Remitter, EventReceiver } from "remitter";
 import { derive, ReadonlyVal, val, Val } from "value-enhancer";
 import { Segment } from "./segment";
-import { Line } from "./line";
+import { Line, LineElement } from "./line";
 
 export type DocumentState$ = {
     readonly zoom: ReadonlyVal<number>;
@@ -82,6 +82,11 @@ export class DocumentState {
             case "set_selection": {
                 protoApply(operation);
                 this.#onSelectionChange(operation);
+                break;
+            }
+            case "remove_text": {
+                protoApply(operation);
+                this.#onRemoveText(operation);
                 break;
             }
             default: {
@@ -189,11 +194,11 @@ export class DocumentState {
     }
 
     /** @return Segment means new closed to cursor; undefined means keeping last; null means replace with nothing */
-    #findClosedToCursor(begin: Point, end: Point): void {
+    #findClosedToCursor(begin: Point, end: Point): Segment | null | undefined {
         let segment: Segment | undefined | null = undefined;
         if (Point.equals(begin, end)) {
             segment = this.#searchSegment(begin);
-            if (segment) {
+            if (segment && begin.offset === 0 && begin.path[1] !== 0) {
                 // When offset is 0, typing will actually insert the previous node.
                 // Adjust the behavior so that the highlighted node is always the node being typed.
                 const beforePath = this.#editor.before(begin);
@@ -211,6 +216,7 @@ export class DocumentState {
                 segment = null;
             }
         }
+        return segment;
     }
 
     #searchSegment(at: slate.Location | Span, mode?: slate.SelectionMode): Segment | undefined {
@@ -242,5 +248,28 @@ export class DocumentState {
             line.setSelected(false);
         }
         this.#selectedLines$.set(selectedLines);
+    }
+
+    #onRemoveText({ path, text }: slate.RemoveTextOperation): void {
+        if (path.length !== 2) {
+            return;
+        }
+        const lineIndex = path[0];
+        const node = Node.get(this.#editor, [lineIndex]);
+        const line = Line.get(node);
+        if (!line) {
+            return;
+        }
+        if (line.checkIsLastWord(text)) {
+            const lineElement: LineElement = {
+                ins: Line.empty(),
+                children: [],
+            };
+            Promise.resolve().then(() => {
+                this.#editor.insertNodes(lineElement, { at: [lineIndex] });
+                this.#editor.removeNodes({ at: [lineIndex + 1] });
+                this.#editor.select([lineIndex]);
+            });
+        }
     }
 }
