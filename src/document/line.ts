@@ -69,21 +69,12 @@ export class Line {
 
         let [leftBegin, leftEnd] = Line.#getBorders(leftChildren);
         let [rightBegin, rightEnd] = Line.#getBorders(rightChildren);
-        let splitInCenter = true;
 
         if (leftBegin !== Number.MAX_SAFE_INTEGER) {
             leftBegin = Math.min(leftBegin, line.$.begin.value);
-        } else {
-            splitInCenter = false;
         }
         if (rightEnd !== Number.MIN_SAFE_INTEGER) {
             rightEnd = Math.max(rightEnd, line.$.end.value);
-        } else {
-            splitInCenter = false;
-        }
-        if (splitInCenter && leftEnd < rightBegin) {
-            leftEnd = (leftEnd + rightBegin) / 2.0;
-            rightBegin = leftEnd;
         }
         const left: LineElement = {
             ins: new Line(leftBegin, leftEnd, leftChildren),
