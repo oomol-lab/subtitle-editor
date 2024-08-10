@@ -2,19 +2,19 @@ import styles from "./Leaf.module.css";
 import React from "react";
 import cls from "classnames";
 
-import { Val } from "value-enhancer";
+import { ReadonlyVal } from "value-enhancer";
 import { useVal } from "use-value-enhancer";
 import { RenderLeafProps } from "slate-react";
-import { isTsLeaf, Leaf } from "../data";
+import { Segment } from "../document";
 
 export const LeafView = (props: RenderLeafProps): React.ReactNode => {
-    const { attributes, children } = props;
-    const leaf = props.leaf;
-    if (isTsLeaf(leaf)) {
+    const { leaf, attributes, children } = props;
+    const segment = Segment.get(leaf);
+    if (segment) {
         return (
             <MarkLeafView
                 attributes={attributes}
-                selected$={leaf.selected$}>
+                selected$={segment.$.selected}>
                 {children}
             </MarkLeafView>
         );
@@ -29,7 +29,7 @@ export const LeafView = (props: RenderLeafProps): React.ReactNode => {
 type MarkLeafViewProps = {
     readonly attributes: RenderLeafProps["attributes"];
     readonly children: RenderLeafProps["children"];
-    readonly selected$: Val<boolean>;
+    readonly selected$: ReadonlyVal<boolean>;
 };
 
 const MarkLeafView = ({ attributes, children, selected$ }: MarkLeafViewProps): React.ReactNode => {

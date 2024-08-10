@@ -3,23 +3,22 @@ import React from "react";
 
 import { CaretRightOutlined } from "@ant-design/icons";
 import { RenderElementProps } from "slate-react";
-import { Element, isTsLeaf, Leaf } from "../data";
+import { useVal } from "use-value-enhancer";
+import { Line } from "../document";
 
 export const ElementView = (props: RenderElementProps): React.ReactNode => {
-    const { attributes, children } = props;
-    const element = props.element as Element;
+    const { attributes, children, element } = props;
     const [isHover, setHover] = React.useState(false);
+    const line = Line.get(element);
     const onMouseEnter = React.useCallback(() => setHover(true), [setHover]);
     const onMouseLeave = React.useCallback(() => setHover(false), [setHover]);
-    let begin = Number.MAX_SAFE_INTEGER;
-    let end = Number.MIN_SAFE_INTEGER;
 
-    for (const child of element.children) {
-        if (isTsLeaf(child)) {
-            begin = Math.min(begin, child.begin);
-            end = Math.max(end, child.end);
-        }
+    if (!line) {
+        throw new Error("invalid element");
     }
+    const begin = useVal(line.$.begin);
+    const end = useVal(line.$.end);
+
     return (
         <div {...attributes}
             className={styles.container}

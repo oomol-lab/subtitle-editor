@@ -4,19 +4,18 @@ import cls from "classnames";
 import styles from "./Editor.module.css";
 
 import { Slate, Editable, ReactEditor, RenderElementProps, RenderLeafProps } from "slate-react";
-import { toElement } from "../data";
-import { State } from "../state";
 import { ElementView } from "./Element";
 import { LeafView } from "./Leaf";
 import { Descendant } from "slate";
+import { toElement, DocumentState } from "../document";
 
 export type EditorProps = React.HTMLAttributes<HTMLDivElement> & {
     readonly editor: ReactEditor;
-    readonly state: State;
+    readonly state: DocumentState;
 };
 
 const Editor = (props: EditorProps) => {
-    const { editor, state: { regionsHub } } = props;
+    const { editor, state } = props;
     const renderElement = React.useCallback(
         (props: RenderElementProps) => <ElementView {...props}/>,
         [],
@@ -26,8 +25,8 @@ const Editor = (props: EditorProps) => {
         [],
     );
     const onValueChange = React.useCallback(
-        (value: Descendant[]) => regionsHub.updateEditorValue(value),
-        [regionsHub],
+        (value: Descendant[]) => state.fireEditorValueUpdating(value),
+        [state],
     );
     return (
         <div {...props}

@@ -5,11 +5,11 @@ import Editor from "./Editor";
 
 import { createEditor } from "slate";
 import { withReact } from "slate-react";
-import { State } from "../state";
+import { DocumentState } from "../document";
 
 export const App = () => {
   const editor = React.useMemo(() => withReact(createEditor()), []);
-  const state = React.useMemo(() => new State(editor), [editor]);
+  const state = React.useMemo(() => new DocumentState(editor), [editor]);
   return (
     <div className={styles.container}>
       <Header
