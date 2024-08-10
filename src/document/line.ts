@@ -76,6 +76,12 @@ export class Line {
         if (rightEnd !== Number.MIN_SAFE_INTEGER) {
             rightEnd = Math.max(rightEnd, line.$.end.value);
         }
+        if (leftBegin >= leftEnd) {
+            leftBegin = Math.min(leftEnd, Line.#getBorders(leftChildren)[0]);
+        }
+        if (rightEnd <= rightBegin) {
+            rightEnd = Math.max(rightBegin, Line.#getBorders(rightChildren)[1]);
+        }
         const left: LineElement = {
             ins: new Line(leftBegin, leftEnd, leftChildren),
             children: leftChildren,
@@ -109,6 +115,11 @@ export class Line {
             return true;
         }
         return child.text.length === word.length;
+    }
+
+    public updateRange(begin: number, end: number): void {
+        this.#begin$.set(begin);
+        this.#end$.set(end);
     }
 
     public fireChildrenMaybeChanged(children: Descendant[]): void {

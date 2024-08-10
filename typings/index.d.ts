@@ -29,6 +29,25 @@ declare module "wavesurfer.js/dist/plugins/regions.esm.js" {
         contentEditable?: boolean
     }
 
+    export export type RegionsEvents = {
+        /** When a region is created */
+        "region-created": [region: Region]
+        /** When a region is being updated */
+        "region-update": [region: Region, side?: "start" | "end"]
+        /** When a region is done updating */
+        "region-updated": [region: Region]
+        /** When a region is removed */
+        "region-removed": [region: Region]
+        /** When a region is clicked */
+        "region-clicked": [region: Region, e: MouseEvent]
+        /** When a region is double-clicked */
+        "region-double-clicked": [region: Region, e: MouseEvent]
+        /** When playback enters a region */
+        "region-in": [region: Region]
+        /** When playback leaves a region */
+        "region-out": [region: Region]
+    }
+
     interface Region {
         readonly start: number;
         readonly end: number;
@@ -38,6 +57,7 @@ declare module "wavesurfer.js/dist/plugins/regions.esm.js" {
 
     interface Regions {
         addRegion(region: RegionParams): Region;
+        on<E, P extends RegionsEvents[E]>(event: E, listener: (...args: P) => void): void;
     }
     export function create(): Regions;
 }
