@@ -1,9 +1,11 @@
 import { val, derive, combine, Val, ReadonlyVal } from "value-enhancer";
 import { Descendant, Element, Node } from "slate";
 import { Segment, SegmentLeaf } from "./segment";
+import { DocumentState } from "./documentState";
 
 export type Line$ = {
     readonly text: ReadonlyVal<string>;
+    readonly isPlaying: ReadonlyVal<boolean>;
     readonly selected: ReadonlyVal<boolean>;
     readonly removed: ReadonlyVal<boolean>;
     readonly begin: ReadonlyVal<number>;
@@ -19,19 +21,24 @@ export class Line {
 
     public readonly $: Line$;
 
+    readonly #root: DocumentState;
+    readonly #isPlaying$: Val<boolean>;
     readonly #selected$: Val<boolean>;
     readonly #removed$: Val<boolean>;
     readonly #begin$: Val<number>;
     readonly #end$: Val<number>;
     readonly #children$: Val<Descendant[]>;
 
-    public constructor(begin: number, end: number, children: Descendant[]) {
+    public constructor(root: DocumentState, begin: number, end: number, children: Descendant[]) {
+        this.#root = root;
         this.#children$ = val(children);
+        this.#isPlaying$ = val(false);
         this.#selected$ = val(false);
         this.#removed$ = val(false);
         this.#begin$ = val(begin);
         this.#end$ = val(end);
         this.$ = Object.freeze({
+            isPlaying: derive(this.#isPlaying$),
             selected: derive(this.#selected$),
             removed: derive(this.#removed$),
             begin: derive(this.#begin$),
@@ -47,10 +54,6 @@ export class Line {
         });
     }
 
-    public static empty(): Line {
-        return new Line(Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER, []);
-    }
-
     public static get(node: Node): Line | null {
         const instance = (node as any as Record<string, unknown>).ins;
         if (instance instanceof Line) {
@@ -59,7 +62,11 @@ export class Line {
         return null;
     }
 
-    public static splitElement(source: Element, position: number): [Element, Element] {
+    public static empty(root: DocumentState): Line {
+        return new Line(root, Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER, []);
+    }
+
+    public static splitElement(root: DocumentState, source: Element, position: number): [Element, Element] {
         const line = Line.get(source);
         if (!line) {
             throw new Error("element is not a line");
@@ -83,11 +90,11 @@ export class Line {
             rightEnd = Math.max(rightBegin, Line.#getBorders(rightChildren)[1]);
         }
         const left: LineElement = {
-            ins: new Line(leftBegin, leftEnd, leftChildren),
+            ins: new Line(root, leftBegin, leftEnd, leftChildren),
             children: leftChildren,
         };
         const right: LineElement = {
-            ins: new Line(rightBegin, rightEnd, rightChildren),
+            ins: new Line(root, rightBegin, rightEnd, rightChildren),
             children: rightChildren,
         };
         return [left, right];
@@ -99,6 +106,10 @@ export class Line {
 
     public fireRemoved(): void {
         this.#removed$.set(true);
+    }
+
+    public clickPlayOrPauseButton(): void {
+        this.#isPlaying$.set(true);
     }
 
     public checkIsLastWord(word: string): boolean {

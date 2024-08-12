@@ -1,0 +1,10 @@
+.container {
+    margin-top: 20px;
+}
+
+.field {
+    span {
+        margin-left: 2px;
+        color: #494F58;
+    }
+}

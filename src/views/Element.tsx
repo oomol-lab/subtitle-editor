@@ -1,8 +1,9 @@
 import styles from "./Element.module.css";
 import React from "react";
 
-import { CaretRightOutlined } from "@ant-design/icons";
+import { PauseOutlined, CaretRightOutlined } from "@ant-design/icons";
 import { RenderElementProps } from "slate-react";
+import { ReadonlyVal } from "value-enhancer";
 import { useVal } from "use-value-enhancer";
 import { Line } from "../document";
 
@@ -12,12 +13,14 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
     const line = Line.get(element);
     const onMouseEnter = React.useCallback(() => setHover(true), [setHover]);
     const onMouseLeave = React.useCallback(() => setHover(false), [setHover]);
+    const onClickPlay = React.useCallback(() => line?.clickPlayOrPauseButton(), [line]);
 
     if (!line) {
         throw new Error("invalid element");
     }
     const begin = useVal(line.$.begin);
     const end = useVal(line.$.end);
+    const isPlaying$ = line.$.isPlaying;
 
     return (
         <div {...attributes}
@@ -27,7 +30,9 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
             <Head
                 begin={begin}
                 end={end}
-                showButton={isHover}/>
+                showButton={isHover}
+                isPlaying$={isPlaying$}
+                onClickPlay={onClickPlay}/>
             <div className={styles.content}>
                 {children}
             </div>
@@ -39,17 +44,21 @@ type HeadProps = {
     readonly begin: number;
     readonly end: number;
     readonly showButton: boolean;
+    readonly isPlaying$: ReadonlyVal<boolean>;
+    readonly onClickPlay: () => void;
 };
 
-const Head = ({ begin, end, showButton }: HeadProps): React.ReactNode => {
+const Head = ({ begin, end, showButton, isPlaying$, onClickPlay }: HeadProps): React.ReactNode => {
+    const isPlaying = useVal(isPlaying$);
     return (
         <div
             className={styles.head}
             contentEditable={false}>
             <button
                 className={styles.button}
-                style={{ visibility: showButton ? "visible" : "hidden" }} >
-                <CaretRightOutlined/>
+                style={{ visibility: showButton ? "visible" : "hidden" }}
+                onClick={onClickPlay}>
+                {isPlaying ? <PauseOutlined /> : <CaretRightOutlined />}
             </button>
             <div className={styles.timestamp}>
                 <span>{formatTimestamp(begin)}</span>

@@ -7,7 +7,7 @@ import { Slate, Editable, ReactEditor, RenderElementProps, RenderLeafProps } fro
 import { ElementView } from "./Element";
 import { LeafView } from "./Leaf";
 import { Descendant } from "slate";
-import { toElement, DocumentState } from "../document";
+import { DocumentState } from "../document";
 
 export type EditorProps = React.HTMLAttributes<HTMLDivElement> & {
     readonly editor: ReactEditor;
@@ -34,7 +34,7 @@ const Editor = (props: EditorProps) => {
             <Slate
                 editor={editor}
                 onValueChange={onValueChange}
-                initialValue={recordSRT.map(toElement)}>
+                initialValue={recordSRT.map(s => state.toElement(s))}>
                 <Editable
                     renderElement={renderElement}
                     renderLeaf={renderLeaf}

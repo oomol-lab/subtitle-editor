@@ -1,9 +1,10 @@
-import slate, { Editor, Point, Node, Range, Span, Text, Path } from "slate";
+import slate, { Editor, Element, Point, Node, Range, Span, Text, Path } from "slate";
 
 import { Remitter, EventReceiver } from "remitter";
 import { derive, ReadonlyVal, val, Val } from "value-enhancer";
 import { Segment } from "./segment";
 import { Line, LineElement } from "./line";
+import { FileSegment, toElement } from "./file";
 
 export type DocumentState$ = {
     readonly zoom: ReadonlyVal<number>;
@@ -48,6 +49,10 @@ export class DocumentState {
 
     public get events(): EventReceiver<DocumentEvents> {
         return this.#remitter;
+    }
+
+    public toElement(fileSegment: FileSegment): Element {
+        return toElement(this, fileSegment);
     }
 
     public fireEditorValueUpdating(children: slate.Descendant[]): void {
@@ -121,7 +126,7 @@ export class DocumentState {
                 // I don't know why, but it works.
                 position = 0;
             }
-            const [left, right] = Line.splitElement(node, position);
+            const [left, right] = Line.splitElement(this, node, position);
             const nextPath = this.#nextPath(path);
 
             if (this.#waitSplitTexts) {
@@ -262,7 +267,7 @@ export class DocumentState {
         }
         if (line.checkIsLastWord(text)) {
             const lineElement: LineElement = {
-                ins: Line.empty(),
+                ins: Line.empty(this),
                 children: [],
             };
             Promise.resolve().then(() => {

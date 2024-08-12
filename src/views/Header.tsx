@@ -4,14 +4,16 @@ import cls from "classnames";
 import WavesurferView, { WavesurferInstances } from "./WavesurferView";
 
 import { DocumentState } from "../document";
-import { bindWavesurfer, bindRegions } from "../wave";
+import { bindWavesurfer, bindRegions, Player } from "../wave";
+import PlayerPanel from "./PlayerPanel";
 
 export type HeaderProps = React.HTMLAttributes<HTMLDivElement> & {
     readonly state: DocumentState;
+    readonly player: Player;
 };
 
 const Header = (props: HeaderProps) => {
-    const { state } = props;
+    const { state, player } = props;
     const [_, setInstances] = React.useState<WavesurferInstances | null>(null);
     const onFirstDecode = React.useCallback(({ wavesurfer, regions }: WavesurferInstances) => {
         wavesurfer.zoom(state.$.zoom.value);
@@ -26,7 +28,8 @@ const Header = (props: HeaderProps) => {
             <WavesurferView
                 url="/data/Record.wav"
                 initWavesurfer={setInstances}
-                firstDecode={onFirstDecode}/>
+                firstDecode={onFirstDecode} />
+            <PlayerPanel player={player} />
         </header>
     );
 };
