@@ -1,7 +1,7 @@
-import { val, derive, combine, Val, ReadonlyVal } from "value-enhancer";
+import { val, derive, combine, flatten, Val, ReadonlyVal } from "value-enhancer";
 import { Descendant, Element, Node } from "slate";
 import { Segment, SegmentLeaf } from "./segment";
-import { DocumentState } from "./documentState";
+import { Player } from "../wave";
 
 export type Line$ = {
     readonly text: ReadonlyVal<string>;
@@ -21,28 +21,26 @@ export class Line {
 
     public readonly $: Line$;
 
-    readonly #root: DocumentState;
-    readonly #isPlaying$: Val<boolean>;
+    readonly #player: Player;
     readonly #selected$: Val<boolean>;
     readonly #removed$: Val<boolean>;
     readonly #begin$: Val<number>;
     readonly #end$: Val<number>;
     readonly #children$: Val<Descendant[]>;
 
-    public constructor(root: DocumentState, begin: number, end: number, children: Descendant[]) {
-        this.#root = root;
+    public constructor(player: Player, begin: number, end: number, children: Descendant[]) {
+        this.#player = player;
         this.#children$ = val(children);
-        this.#isPlaying$ = val(false);
         this.#selected$ = val(false);
         this.#removed$ = val(false);
         this.#begin$ = val(begin);
         this.#end$ = val(end);
         this.$ = Object.freeze({
-            isPlaying: derive(this.#isPlaying$),
             selected: derive(this.#selected$),
             removed: derive(this.#removed$),
             begin: derive(this.#begin$),
             end: derive(this.#end$),
+            isPlaying: player.isLinePlaying$(this),
             text: derive(this.#children$, children => Line.#getTextOfChildren(children)),
             displayTimestamp: combine(
                 [this.#begin$, this.#end$],
@@ -62,11 +60,11 @@ export class Line {
         return null;
     }
 
-    public static empty(root: DocumentState): Line {
-        return new Line(root, Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER, []);
+    public static empty(player: Player): Line {
+        return new Line(player, Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER, []);
     }
 
-    public static splitElement(root: DocumentState, source: Element, position: number): [Element, Element] {
+    public static splitElement(player: Player, source: Element, position: number): [Element, Element] {
         const line = Line.get(source);
         if (!line) {
             throw new Error("element is not a line");
@@ -90,11 +88,11 @@ export class Line {
             rightEnd = Math.max(rightBegin, Line.#getBorders(rightChildren)[1]);
         }
         const left: LineElement = {
-            ins: new Line(root, leftBegin, leftEnd, leftChildren),
+            ins: new Line(player, leftBegin, leftEnd, leftChildren),
             children: leftChildren,
         };
         const right: LineElement = {
-            ins: new Line(root, rightBegin, rightEnd, rightChildren),
+            ins: new Line(player, rightBegin, rightEnd, rightChildren),
             children: rightChildren,
         };
         return [left, right];
@@ -109,7 +107,11 @@ export class Line {
     }
 
     public clickPlayOrPauseButton(): void {
-        this.#isPlaying$.set(true);
+        if (this.$.isPlaying.value) {
+            this.#player.clickStop(this)
+        } else {
+            this.#player.clickPlay(this);
+        }
     }
 
     public checkIsLastWord(word: string): boolean {

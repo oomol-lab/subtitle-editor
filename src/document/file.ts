@@ -1,6 +1,6 @@
 import { Element, Text } from "slate";
 import { Segment, SegmentLeaf } from "./segment";
-import { Line, LineElement } from "./line";
+import { Line, LineDelegate, LineElement } from "./line";
 import { DocumentState } from "./documentState";
 
 export type FileSegment = {
@@ -14,7 +14,7 @@ export type FileSegment = {
     }[];
 };
 
-export function toElement(root: DocumentState, { begin, end, text, words }: FileSegment): Element {
+export function toElement(delegate: LineDelegate, { begin, end, text, words }: FileSegment): Element {
     let textIndex = 0;
     const children: Text[] = [];
     const plainText: string[] = [];
@@ -48,7 +48,7 @@ export function toElement(root: DocumentState, { begin, end, text, words }: File
     if (plainText.length > 0) {
         children.push({ text: plainText.splice(0).join("") });
     }
-    const line = new Line(root, begin, end, children);
+    const line = new Line(delegate, begin, end, children);
     const element: LineElement = {
         ins: line,
         children,

@@ -2,7 +2,7 @@ import { val, combine, derive, flatten, Val, ValDisposer } from "value-enhancer"
 import { Region, Regions } from "wavesurfer.js/dist/plugins/regions.esm.js";
 
 import { DocumentState, Line } from "../document";
-import { toMilliseconds, toSeconds } from "../utils";
+import { toMilliseconds, toSeconds } from "./utils";
 
 // to see: https://wavesurfer.xyz/examples/?regions.js
 // source code: https://github.com/katspaugh/wavesurfer.js/blob/main/src/plugins/regions.ts

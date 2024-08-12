@@ -5,12 +5,14 @@ import { derive, ReadonlyVal, val, Val } from "value-enhancer";
 import { Segment } from "./segment";
 import { Line, LineElement } from "./line";
 import { FileSegment, toElement } from "./file";
+import { Player } from "../wave";
 
 export type DocumentState$ = {
     readonly zoom: ReadonlyVal<number>;
     readonly lines: ReadonlyVal<readonly Line[]>;
     readonly highlightSegment: ReadonlyVal<Segment | null>;
     readonly selectedLines: ReadonlyVal<readonly Line[]>;
+    readonly playingLine: ReadonlyVal<Line | null>;
 };
 
 export type DocumentEvents = {
@@ -24,15 +26,19 @@ export class DocumentState {
 
     readonly #editor: Editor;
     readonly #remitter: Remitter<DocumentEvents>;
+    readonly #playingLine$: Val<Line | null>;
     readonly #zoom$: Val<number>;
     readonly #highlightSegment$: Val<Segment | null>;
     readonly #lines$: Val<readonly Line[]>;
     readonly #selectedLines$: Val<readonly Line[]>;
 
+    #player: Player | null = null;
+
     public constructor(editor: Editor) {
         const protoApply = editor.apply;
         this.#editor = editor;
         this.#remitter = new Remitter();
+        this.#playingLine$ = val<Line | null>(null);
         this.#zoom$ = val(50);
         this.#lines$ = val<readonly Line[]>([]);
         this.#selectedLines$ = val<readonly Line[]>([]);
@@ -42,6 +48,7 @@ export class DocumentState {
             lines: derive(this.#lines$),
             selectedLines: derive(this.#selectedLines$),
             highlightSegment: derive(this.#highlightSegment$),
+            playingLine: derive(this.#playingLine$),
         });
         editor.apply = operation => this.#injectApply(protoApply, operation);
         Promise.resolve().then(() => this.fireEditorValueUpdating(editor.children));
@@ -52,7 +59,18 @@ export class DocumentState {
     }
 
     public toElement(fileSegment: FileSegment): Element {
-        return toElement(this, fileSegment);
+        return toElement(this.#player!, fileSegment);
+    }
+
+    public bindPlayer(player: Player): Player {
+        return this.#player = player;
+    }
+
+    public selectFirstPositionOfLine(line: Line): void {
+        const rowIndex = this.#lines$.value.indexOf(line);
+        if (rowIndex !== -1) {
+            this.#editor.select([rowIndex]);
+        }
     }
 
     public fireEditorValueUpdating(children: slate.Descendant[]): void {
@@ -126,7 +144,7 @@ export class DocumentState {
                 // I don't know why, but it works.
                 position = 0;
             }
-            const [left, right] = Line.splitElement(this, node, position);
+            const [left, right] = Line.splitElement(this.#player!, node, position);
             const nextPath = this.#nextPath(path);
 
             if (this.#waitSplitTexts) {
@@ -267,7 +285,7 @@ export class DocumentState {
         }
         if (line.checkIsLastWord(text)) {
             const lineElement: LineElement = {
-                ins: Line.empty(this),
+                ins: Line.empty(this.#player!),
                 children: [],
             };
             Promise.resolve().then(() => {

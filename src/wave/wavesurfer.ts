@@ -1,7 +1,7 @@
 import WaveSurfer from "wavesurfer.js";
 import { DocumentState, Line } from "../document";
 import { derive, ReadonlyVal } from "value-enhancer";
-import { toSeconds } from "../utils";
+import { toSeconds } from "./utils";
 
 export function bindWavesurfer(state: DocumentState, wavesurfer: WaveSurfer): void {
     const firstSelectedLine$: ReadonlyVal<Line | null> = derive(state.$.selectedLines, lines => {

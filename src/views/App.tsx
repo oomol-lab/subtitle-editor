@@ -11,7 +11,8 @@ import { Player } from "../wave";
 export const App = () => {
   const editor = React.useMemo(() => withReact(createEditor()), []);
   const state = React.useMemo(() => new DocumentState(editor), [editor]);
-  const player = React.useMemo(() => new Player, []);
+  const player = React.useMemo(() => state.bindPlayer(new Player(state)), [state]);
+
   return (
     <div className={styles.container}>
       <Header

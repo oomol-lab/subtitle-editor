@@ -17,9 +17,10 @@ const Header = (props: HeaderProps) => {
     const [_, setInstances] = React.useState<WavesurferInstances | null>(null);
     const onFirstDecode = React.useCallback(({ wavesurfer, regions }: WavesurferInstances) => {
         wavesurfer.zoom(state.$.zoom.value);
+        player.bindWaveSurfer(wavesurfer);
         bindWavesurfer(state, wavesurfer);
         bindRegions(state, regions);
-    }, [state]);
+    }, [state, player]);
 
     return (
         <header
