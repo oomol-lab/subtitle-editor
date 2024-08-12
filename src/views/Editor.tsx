@@ -30,6 +30,7 @@ const Editor = (props: EditorProps) => {
     );
     return (
         <div {...props}
+            ref={state.setEditorRef}
             className={cls(styles.container, props.className)}>
             <Slate
                 editor={editor}

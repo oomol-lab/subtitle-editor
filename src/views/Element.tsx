@@ -21,6 +21,18 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
     const lineState = useVal(lineState$);
     const displayTimestamp = useVal(line.$.displayTimestamp);
 
+    // Slate need ref. I can't replace it.
+    const ref = React.useMemo(() => {
+        if (attributes.ref && line.setRef) {
+            return (element: HTMLDivElement | null) => {
+                attributes.ref(element);
+                line.setRef(element);
+            };
+        } else {
+            return attributes.ref || line.setRef || (() => void 0);
+        }
+
+    }, [attributes.ref, line.setRef]);
     const onMouseEnter = React.useCallback(() => setHover(true), [setHover]);
     const onMouseLeave = React.useCallback(() => setHover(false), [setHover]);
     const onClickPlay = React.useCallback(() => {
@@ -55,6 +67,7 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
     }
     return (
         <div {...attributes}
+            ref={ref}
             className={cls(styles.container, markPlay && styles["mark-play"])}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}>

@@ -28,6 +28,7 @@ export const WavesurferView = (props: WavesurferProps) => {
             progressColor: "rgb(100, 0, 100)",
             url: props.url,
             normalize: true,
+            interact: false,
             plugins: [
                 regions, ...createPlugins(),
             ],

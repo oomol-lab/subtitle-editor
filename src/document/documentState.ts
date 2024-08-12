@@ -33,6 +33,7 @@ export class DocumentState {
     readonly #selectedLines$: Val<readonly Line[]>;
 
     #player: Player | null = null;
+    #editorElement: HTMLDivElement | null = null;
 
     public constructor(editor: Editor) {
         const protoApply = editor.apply;
@@ -58,6 +59,10 @@ export class DocumentState {
         return this.#remitter;
     }
 
+    public setEditorRef = (editorElement: HTMLDivElement | null): void => {
+        this.#editorElement = editorElement;
+    };
+
     public toElement(fileSegment: FileSegment): Element {
         return toElement(this.#player!, fileSegment);
     }
@@ -68,8 +73,30 @@ export class DocumentState {
 
     public selectFirstPositionOfLine(line: Line): void {
         const rowIndex = this.#lines$.value.indexOf(line);
-        if (rowIndex !== -1) {
-            this.#editor.select([rowIndex]);
+        const container = this.#editorElement;
+
+        if (rowIndex === -1) {
+            return;
+        }
+        this.#editor.select([rowIndex]);
+
+        if (!container) {
+            return;
+        }
+        const lineReact = line.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+
+        if (!lineReact) {
+            return;
+        }
+        const viewTop = lineReact.top - containerRect.top;
+        const viewBottom = viewTop + lineReact.height;
+
+        if (viewBottom <= 0 || viewTop >= containerRect.height) {
+            container.scrollTo({
+                top: container.scrollTop + viewTop,
+                behavior: "smooth",
+            });
         }
     }
 

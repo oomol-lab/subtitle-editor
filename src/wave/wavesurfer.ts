@@ -1,4 +1,5 @@
 import WaveSurfer from "wavesurfer.js";
+
 import { DocumentState, Line } from "../document";
 import { derive, ReadonlyVal } from "value-enhancer";
 import { toSeconds } from "./utils";

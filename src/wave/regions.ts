@@ -23,7 +23,9 @@ export function bindRegions(state: DocumentState, regions: Regions): void {
     state.$.lines.value.forEach(onCreateLine);
     state.events.on("addedLine", onCreateLine);
     state.events.on("removedLine", onRemoveLine);
+
     regions.on("region-updated", onRegionUpdated);
+    regions.on("region-clicked", onRegionClicked);
 
     function onCreateLine(line: Line): void {
         const display$ = combine(
@@ -88,6 +90,14 @@ export function bindRegions(state: DocumentState, regions: Regions): void {
         const end = toMilliseconds(region.end);
 
         line.updateRange(begin, end);
+    }
+
+    function onRegionClicked(region: Region, _: MouseEvent): void {
+        const line = region2Lines.get(region);
+        if (!line) {
+            return;
+        }
+        state.selectFirstPositionOfLine(line);
     }
 
     function regionOptions(

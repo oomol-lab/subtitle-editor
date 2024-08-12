@@ -27,6 +27,8 @@ export class Line {
     readonly #end$: Val<number>;
     readonly #children$: Val<Descendant[]>;
 
+    #refElement: HTMLDivElement | null = null;
+
     public constructor(player: Player, begin: number, end: number, children: Descendant[]) {
         this.#player = player;
         this.#children$ = val(children);
@@ -98,6 +100,17 @@ export class Line {
 
     public get player(): Player {
         return this.#player;
+    }
+
+    public setRef = (refElement: HTMLDivElement | null): void => {
+        this.#refElement = refElement;
+    };
+
+    public getBoundingClientRect(): DOMRect | null {
+        if (!this.#refElement) {
+            return null;
+        }
+        return this.#refElement.getBoundingClientRect();
     }
 
     public setSelected(selected: boolean): void {

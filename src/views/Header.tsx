@@ -1,11 +1,11 @@
 import React from "react";
 import styles from "./Header.module.css";
 import cls from "classnames";
+import PlayerPanel from "./PlayerPanel";
 import WavesurferView, { WavesurferInstances } from "./WavesurferView";
 
 import { DocumentState } from "../document";
 import { bindWavesurfer, bindRegions, Player } from "../wave";
-import PlayerPanel from "./PlayerPanel";
 
 export type HeaderProps = React.HTMLAttributes<HTMLDivElement> & {
     readonly state: DocumentState;
