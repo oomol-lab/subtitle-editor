@@ -1,38 +1,77 @@
 import styles from "./Element.module.css";
 import React from "react";
+import cls from "classnames";
 
 import { PauseOutlined, CaretRightOutlined } from "@ant-design/icons";
 import { RenderElementProps } from "slate-react";
-import { ReadonlyVal } from "value-enhancer";
 import { useVal } from "use-value-enhancer";
 import { Line } from "../document";
+import { LinePlayState } from "../wave";
 
 export const ElementView = (props: RenderElementProps): React.ReactNode => {
     const { attributes, children, element } = props;
     const [isHover, setHover] = React.useState(false);
     const line = Line.get(element);
-    const onMouseEnter = React.useCallback(() => setHover(true), [setHover]);
-    const onMouseLeave = React.useCallback(() => setHover(false), [setHover]);
-    const onClickPlay = React.useCallback(() => line?.clickPlayOrPauseButton(), [line]);
 
     if (!line) {
         throw new Error("invalid element");
     }
+    const player = line.player;
+    const lineState$ = React.useMemo(() => player.lineState$(line), [player]);
+    const lineState = useVal(lineState$);
+    const displayTimestamp = useVal(line.$.displayTimestamp);
+
+    const onMouseEnter = React.useCallback(() => setHover(true), [setHover]);
+    const onMouseLeave = React.useCallback(() => setHover(false), [setHover]);
+    const onClickPlay = React.useCallback(() => {
+        if (lineState === LinePlayState.MarkPlay) {
+            line.player.clickStop(line);
+        } else {
+            line.player.clickPlay(line);
+        }
+    }, [line, lineState]);
+
     const begin = useVal(line.$.begin);
     const end = useVal(line.$.end);
-    const isPlaying$ = line.$.isPlaying;
+    const markPlay = lineState === LinePlayState.MarkPlay;
 
+    let showButton = false;
+
+    if (displayTimestamp) {
+        switch (lineState) {
+            case LinePlayState.MarkPlay: {
+                showButton = true;
+                break;
+            }
+            case LinePlayState.Free: {
+                showButton = isHover;
+                break;
+            }
+            case LinePlayState.Ban: {
+                showButton = false;
+                break;
+            }
+        }
+    }
     return (
         <div {...attributes}
-            className={styles.container}
+            className={cls(styles.container, markPlay && styles["mark-play"])}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}>
-            <Head
-                begin={begin}
-                end={end}
-                showButton={isHover}
-                isPlaying$={isPlaying$}
-                onClickPlay={onClickPlay}/>
+            <div
+                className={styles.head}
+                contentEditable={false}>
+                <button
+                    className={styles.button}
+                    style={{ visibility: showButton ? "visible" : "hidden" }}
+                    onClick={onClickPlay}>
+                    {markPlay ? <PauseOutlined /> : <CaretRightOutlined />}
+                </button>
+                <div className={styles.timestamp}>
+                    <span>{displayTimestamp ? formatTimestamp(begin) : ""}</span>
+                    <span>{displayTimestamp ? formatTimestamp(end) : ""}</span>
+                </div>
+            </div>
             <div className={styles.content}>
                 {children}
             </div>
@@ -40,39 +79,7 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
     );
 };
 
-type HeadProps = {
-    readonly begin: number;
-    readonly end: number;
-    readonly showButton: boolean;
-    readonly isPlaying$: ReadonlyVal<boolean>;
-    readonly onClickPlay: () => void;
-};
-
-const Head = ({ begin, end, showButton, isPlaying$, onClickPlay }: HeadProps): React.ReactNode => {
-    const isPlaying = useVal(isPlaying$);
-    return (
-        <div
-            className={styles.head}
-            contentEditable={false}>
-            <button
-                className={styles.button}
-                style={{ visibility: showButton ? "visible" : "hidden" }}
-                onClick={onClickPlay}>
-                {isPlaying ? <PauseOutlined /> : <CaretRightOutlined />}
-            </button>
-            <div className={styles.timestamp}>
-                <span>{formatTimestamp(begin)}</span>
-                <span>{formatTimestamp(end)}</span>
-            </div>
-        </div>
-    );
-};
-
 function formatTimestamp(milliseconds: number): string {
-    if (milliseconds === Number.MAX_SAFE_INTEGER ||
-        milliseconds === Number.MIN_SAFE_INTEGER) {
-        return "";
-    }
     const hours = Math.floor(milliseconds / (1000 * 60 * 60));
     const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000);

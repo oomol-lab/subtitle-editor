@@ -1,6 +1,6 @@
 import WaveSurfer from "wavesurfer.js";
 
-import { val, derive, combine, Val, ReadonlyVal } from "value-enhancer";
+import { val, derive, combine, flatten, Val, ReadonlyVal } from "value-enhancer";
 import { DocumentState, Line } from "../document";
 import { toSeconds } from "./utils";
 
@@ -11,6 +11,12 @@ export type PlayerParams = {
 export type Player$ = {
     readonly willAlwaysPlay: Val<boolean>;
 };
+
+export enum LinePlayState {
+    MarkPlay,
+    Ban, // because another line is focused
+    Free,
+}
 
 export class Player {
 
@@ -38,13 +44,8 @@ export class Player {
                 this.#pause();
             }
         });
-        this.#focusedLine$ = derive(state.$.selectedLines, selectedLines => {
-            if (selectedLines.length !== 1) {
-                return null;
-            } else {
-                return selectedLines[0];
-            }
-        });
+        this.#focusedLine$ = this.#createFocusedLine$();
+
         const playingLine$ = combine(
             [this.#markPlaying, this.#focusedLine$],
             ([markPlaying, focusedLine]) => markPlaying ? focusedLine : null,
@@ -54,7 +55,35 @@ export class Player {
                 const begin = playingLine.$.begin.value;
                 const end = playingLine.$.end.value;
                 this.#play(begin, end);
+            } else {
+                this.#pause();
             }
+        });
+    }
+
+    #createFocusedLine$(): ReadonlyVal<Line | null> {
+        const falseVal$ = val(false);
+        const onlySelectedLine = derive(this.#state.$.selectedLines, selectedLines => {
+            if (selectedLines.length !== 1) {
+                return null;
+            }
+            return selectedLines[0];
+        });
+        const onlySelectedLineDisplayTimestamp = flatten(onlySelectedLine, line => {
+            if (line) {
+                return line.$.displayTimestamp;
+            } else {
+                return falseVal$;
+            }
+        });
+        return combine([onlySelectedLine, onlySelectedLineDisplayTimestamp], ([line, displayTimestamp]) => {
+            if (!line) {
+                return null;
+            }
+            if (!displayTimestamp) {
+                return null;
+            }
+            return line;
         });
     }
 
@@ -70,10 +99,18 @@ export class Player {
         this.#markPlaying.set(false);
     }
 
-    public isLinePlaying$(line: Line): ReadonlyVal<boolean> {
+    public lineState$(line: Line): ReadonlyVal<LinePlayState> {
         return combine(
             [this.#markPlaying, this.#focusedLine$],
-            ([markPlaying, focusedLine]) => markPlaying && focusedLine === line,
+            ([markPlaying, focusedLine]) => {
+                if (!markPlaying) {
+                    return LinePlayState.Free;
+                } else if (focusedLine === line) {
+                    return LinePlayState.MarkPlay;
+                } else {
+                    return LinePlayState.Ban;
+                }
+            },
         );
     }
 

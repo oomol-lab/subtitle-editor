@@ -1,11 +1,10 @@
-import { val, derive, combine, flatten, Val, ReadonlyVal } from "value-enhancer";
+import { val, derive, combine, Val, ReadonlyVal } from "value-enhancer";
 import { Descendant, Element, Node } from "slate";
 import { Segment, SegmentLeaf } from "./segment";
 import { Player } from "../wave";
 
 export type Line$ = {
     readonly text: ReadonlyVal<string>;
-    readonly isPlaying: ReadonlyVal<boolean>;
     readonly selected: ReadonlyVal<boolean>;
     readonly removed: ReadonlyVal<boolean>;
     readonly begin: ReadonlyVal<number>;
@@ -40,7 +39,6 @@ export class Line {
             removed: derive(this.#removed$),
             begin: derive(this.#begin$),
             end: derive(this.#end$),
-            isPlaying: player.isLinePlaying$(this),
             text: derive(this.#children$, children => Line.#getTextOfChildren(children)),
             displayTimestamp: combine(
                 [this.#begin$, this.#end$],
@@ -98,20 +96,16 @@ export class Line {
         return [left, right];
     }
 
+    public get player(): Player {
+        return this.#player;
+    }
+
     public setSelected(selected: boolean): void {
         this.#selected$.set(selected);
     }
 
     public fireRemoved(): void {
         this.#removed$.set(true);
-    }
-
-    public clickPlayOrPauseButton(): void {
-        if (this.$.isPlaying.value) {
-            this.#player.clickStop(this)
-        } else {
-            this.#player.clickPlay(this);
-        }
     }
 
     public checkIsLastWord(word: string): boolean {
