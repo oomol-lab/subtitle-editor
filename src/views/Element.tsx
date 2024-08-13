@@ -37,7 +37,7 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
     const onMouseLeave = React.useCallback(() => setHover(false), [setHover]);
     const onClickPlay = React.useCallback(() => {
         if (lineState === LinePlayState.MarkPlay) {
-            line.player.clickStop(line);
+            line.player.clickPause();
         } else {
             line.player.clickPlay(line);
         }

@@ -8,7 +8,6 @@ import { FileSegment, toElement } from "./file";
 import { Player } from "../wave";
 
 export type DocumentState$ = {
-    readonly zoom: ReadonlyVal<number>;
     readonly lines: ReadonlyVal<readonly Line[]>;
     readonly highlightSegment: ReadonlyVal<Segment | null>;
     readonly selectedLines: ReadonlyVal<readonly Line[]>;
@@ -27,7 +26,6 @@ export class DocumentState {
     readonly #editor: Editor;
     readonly #remitter: Remitter<DocumentEvents>;
     readonly #playingLine$: Val<Line | null>;
-    readonly #zoom$: Val<number>;
     readonly #highlightSegment$: Val<Segment | null>;
     readonly #lines$: Val<readonly Line[]>;
     readonly #selectedLines$: Val<readonly Line[]>;
@@ -40,12 +38,10 @@ export class DocumentState {
         this.#editor = editor;
         this.#remitter = new Remitter();
         this.#playingLine$ = val<Line | null>(null);
-        this.#zoom$ = val(50);
         this.#lines$ = val<readonly Line[]>([]);
         this.#selectedLines$ = val<readonly Line[]>([]);
         this.#highlightSegment$ = val<Segment | null>(null);
         this.$ = Object.freeze({
-            zoom: derive(this.#zoom$),
             lines: derive(this.#lines$),
             selectedLines: derive(this.#selectedLines$),
             highlightSegment: derive(this.#highlightSegment$),

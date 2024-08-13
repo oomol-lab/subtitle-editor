@@ -6,11 +6,21 @@ import { toSeconds } from "./utils";
 
 export type PlayerParams = {
     readonly playingLine$: ReadonlyVal<Line | null>;
+    readonly panelPlayState$: ReadonlyVal<PanelPlayState>;
 };
 
 export type Player$ = {
+    readonly zoom: Val<number>;
+    readonly volume: Val<number>;
     readonly willAlwaysPlay: Val<boolean>;
+    readonly panelPlayState: ReadonlyVal<PanelPlayState>;
 };
+
+export enum PanelPlayState {
+    Disable,
+    Playing,
+    Paused,
+}
 
 export enum LinePlayState {
     MarkPlay,
@@ -20,11 +30,17 @@ export enum LinePlayState {
 
 export class Player {
 
+    public static readonly zoomInitValue = 50;
+    public static readonly volumeInitValue = 1.0;
+
     public readonly $: Player$;
 
     readonly #state: DocumentState;
+    readonly #zoom$: Val<number> = val(Player.zoomInitValue);
+    readonly #volume$: Val<number> = val(Player.volumeInitValue);
     readonly #willAlwaysPlay$ = val(false);
-    readonly #markPlaying = val(false);
+    readonly #markPlaying$ = val(false);
+    readonly #isPlaying$ = val(false);
     readonly #focusedLine$: ReadonlyVal<Line | null>;
 
     #wavesurfer: WaveSurfer | null = null;
@@ -32,29 +48,30 @@ export class Player {
 
     public constructor(state: DocumentState) {
         this.#state = state;
+        this.#focusedLine$ = this.#createFocusedLine$();
+        this.#listenValAndOperate();
         this.$ = Object.freeze({
+            zoom: this.#zoom$,
+            volume: this.#volume$,
             willAlwaysPlay: this.#willAlwaysPlay$,
+            panelPlayState: combine(
+                [this.#focusedLine$, this.#isPlaying$],
+                ([focusedLine, isPlaying]) => {
+                    if (!focusedLine) {
+                        return PanelPlayState.Disable;
+                    } else if (isPlaying) {
+                        return PanelPlayState.Playing
+                    } else {
+                        return PanelPlayState.Paused;
+                    }
+                },
+            ),
         });
         state.$.playingLine.reaction(playingLine => {
             if (playingLine) {
                 const from = playingLine.$.begin.value;
                 const to = playingLine.$.end.value;
                 this.#play(from ,to);
-            } else {
-                this.#pause();
-            }
-        });
-        this.#focusedLine$ = this.#createFocusedLine$();
-
-        const playingLine$ = combine(
-            [this.#markPlaying, this.#focusedLine$],
-            ([markPlaying, focusedLine]) => markPlaying ? focusedLine : null,
-        );
-        playingLine$.reaction(playingLine => {
-            if (playingLine) {
-                const begin = playingLine.$.begin.value;
-                const end = playingLine.$.end.value;
-                this.#play(begin, end);
             } else {
                 this.#pause();
             }
@@ -87,21 +104,55 @@ export class Player {
         });
     }
 
-    public clickPlay(line: Line): void {
-        if (this.#focusedLine$.value != line) {
-            this.#state.selectFirstPositionOfLine(line);
-        }
-        this.#markPlaying.set(true);
+    #listenValAndOperate(): void {
+        const playingLine$ = combine(
+            [this.#markPlaying$, this.#focusedLine$],
+            ([markPlaying, focusedLine]) => markPlaying ? focusedLine : null,
+        );
+        playingLine$.reaction(playingLine => {
+            if (playingLine) {
+                const begin = playingLine.$.begin.value;
+                const end = playingLine.$.end.value;
+                this.#play(begin, end);
+            } else {
+                this.#pause();
+            }
+        });
+        const toSeekLine$ = combine(
+            [this.#markPlaying$, this.#state.$.selectedLines],
+            ([markPlaying, selectedLines]) => {
+                if (markPlaying) {
+                    return null;
+                }
+                if (selectedLines.length === 0) {
+                    return null;
+                }
+                return selectedLines[0];
+            },
+        );
+        toSeekLine$.reaction(toSeekLine => {
+            if (toSeekLine) {
+                const time = toSeconds(toSeekLine.$.begin.value);
+                this.#wavesurfer?.setTime(time);
+            }
+        });
     }
 
-    public clickStop(_: Line): void {
+    public clickPlay(line?: Line): void {
+        if (line && this.#focusedLine$.value != line) {
+            this.#state.selectFirstPositionOfLine(line);
+        }
+        this.#markPlaying$.set(true);
+    }
+
+    public clickPause(): void {
         this.#pause();
-        this.#markPlaying.set(false);
+        this.#markPlaying$.set(false);
     }
 
     public lineState$(line: Line): ReadonlyVal<LinePlayState> {
         return combine(
-            [this.#markPlaying, this.#focusedLine$],
+            [this.#markPlaying$, this.#focusedLine$],
             ([markPlaying, focusedLine]) => {
                 if (!markPlaying) {
                     return LinePlayState.Free;
@@ -123,13 +174,11 @@ export class Player {
             if (currentTime >= this.#stopTime) {
                 this.#pause();
                 if (!this.#willAlwaysPlay$.value) {
-                    this.#markPlaying.set(false);
+                    this.#markPlaying$.set(false);
                 }
             }
         });
     }
-
-    #isPlaying: boolean = false;
 
     #play(from: number, to: number): void {
         const wavesurfer = this.#wavesurfer!;
@@ -144,16 +193,16 @@ export class Player {
         this.#stopTime = Math.min(endTime, wavesurfer.getDuration());
         wavesurfer.setTime(beginTime);
 
-        if (!this.#isPlaying) {
+        if (!this.#isPlaying$.value) {
             wavesurfer.play();
-            this.#isPlaying = true;
+            this.#isPlaying$.set(true);
         }
     }
 
     #pause(): void {
-        if (this.#isPlaying) {
+        if (this.#isPlaying$.value) {
             this.#wavesurfer!.pause();
-            this.#isPlaying = false;
+            this.#isPlaying$.set(false);
         }
     }
 }

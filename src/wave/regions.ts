@@ -1,4 +1,4 @@
-import { val, combine, derive, flatten, Val, ValDisposer } from "value-enhancer";
+import { val, combine, derive, Val, ValDisposer } from "value-enhancer";
 import { Region, Regions } from "wavesurfer.js/dist/plugins/regions.esm.js";
 
 import { DocumentState, Line } from "../document";

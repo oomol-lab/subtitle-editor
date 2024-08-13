@@ -36,7 +36,6 @@ export const WavesurferView = (props: WavesurferProps) => {
         <WavesurferPlayer
             waveColor="rgb(200, 0, 200)"
             progressColor="rgb(100, 0, 100)"
-            normalize={true}
             interact={false}
             url={props.url}
             onDecode={onDecode}

@@ -1,10 +1,17 @@
-import WaveSurfer from "wavesurfer.js";
+import WaveSurfer, { WaveSurferOptions } from "wavesurfer.js";
 
 import { DocumentState, Line } from "../document";
-import { derive, ReadonlyVal } from "value-enhancer";
+import { derive, combine, ReadonlyVal } from "value-enhancer";
 import { toSeconds } from "./utils";
+import { Player } from "./player";
 
-export function bindWavesurfer(state: DocumentState, wavesurfer: WaveSurfer): void {
+export function bindWavesurfer(state: DocumentState, player: Player, wavesurfer: WaveSurfer): void {
+    const options$: ReadonlyVal<Partial<WaveSurferOptions>> = combine(
+        [player.$.volume],
+        ([volume]) => ({
+            barHeight: volume,
+        }),
+    );
     const firstSelectedLine$: ReadonlyVal<Line | null> = derive(state.$.selectedLines, lines => {
         if (lines.length > 0) {
             return lines[0];
@@ -12,12 +19,15 @@ export function bindWavesurfer(state: DocumentState, wavesurfer: WaveSurfer): vo
             return null;
         }
     });
+    player.$.zoom.subscribe(zoom => {
+        wavesurfer.zoom(zoom);
+    });
     firstSelectedLine$.subscribe(firstSelectedLine => {
         if (!firstSelectedLine) {
             return;
         }
         const $ = firstSelectedLine.$;
-        const zoom = state.$.zoom.value;
+        const zoom = player.$.zoom.value;
         const selectedBegin = toSeconds($.begin.value);
         const selectedEnd = toSeconds($.end.value);
         const selectedWidth = selectedEnd - selectedBegin;
@@ -34,4 +44,5 @@ export function bindWavesurfer(state: DocumentState, wavesurfer: WaveSurfer): vo
             wavesurfer.setScrollTime(time);
         }
     });
+    options$.subscribe(options => wavesurfer.setOptions(options));
 }

@@ -15,9 +15,8 @@ export type HeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 const Header = (props: HeaderProps) => {
     const { state, player } = props;
     const onFirstDecode = React.useCallback(({ wavesurfer, regions }: WavesurferInstances) => {
-        wavesurfer.zoom(state.$.zoom.value);
         player.bindWaveSurfer(wavesurfer);
-        bindWavesurfer(state, wavesurfer);
+        bindWavesurfer(state, player, wavesurfer);
         bindRegions(state, regions);
     }, [state, player]);
 
