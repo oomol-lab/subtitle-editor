@@ -11,7 +11,6 @@ export type DocumentState$ = {
     readonly lines: ReadonlyVal<readonly Line[]>;
     readonly highlightSegment: ReadonlyVal<Segment | null>;
     readonly selectedLines: ReadonlyVal<readonly Line[]>;
-    readonly playingLine: ReadonlyVal<Line | null>;
 };
 
 export type DocumentEvents = {
@@ -25,7 +24,6 @@ export class DocumentState {
 
     readonly #editor: Editor;
     readonly #remitter: Remitter<DocumentEvents>;
-    readonly #playingLine$: Val<Line | null>;
     readonly #highlightSegment$: Val<Segment | null>;
     readonly #lines$: Val<readonly Line[]>;
     readonly #selectedLines$: Val<readonly Line[]>;
@@ -37,7 +35,6 @@ export class DocumentState {
         const protoApply = editor.apply;
         this.#editor = editor;
         this.#remitter = new Remitter();
-        this.#playingLine$ = val<Line | null>(null);
         this.#lines$ = val<readonly Line[]>([]);
         this.#selectedLines$ = val<readonly Line[]>([]);
         this.#highlightSegment$ = val<Segment | null>(null);
@@ -45,7 +42,6 @@ export class DocumentState {
             lines: derive(this.#lines$),
             selectedLines: derive(this.#selectedLines$),
             highlightSegment: derive(this.#highlightSegment$),
-            playingLine: derive(this.#playingLine$),
         });
         editor.apply = operation => this.#injectApply(protoApply, operation);
         Promise.resolve().then(() => this.fireEditorValueUpdating(editor.children));

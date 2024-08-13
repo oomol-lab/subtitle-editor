@@ -38,10 +38,11 @@ export class Player {
     readonly #state: DocumentState;
     readonly #zoom$: Val<number> = val(Player.zoomInitValue);
     readonly #volume$: Val<number> = val(Player.volumeInitValue);
-    readonly #willAlwaysPlay$ = val(false);
-    readonly #markPlaying$ = val(false);
-    readonly #isPlaying$ = val(false);
+    readonly #willAlwaysPlay$ = val<boolean>(false);
+    readonly #markPlaying$ = val<boolean>(false);
+    readonly #isPlaying$ = val<boolean>(false);
     readonly #focusedLine$: ReadonlyVal<Line | null>;
+    readonly #playingLine$: ReadonlyVal<Line | null>;
 
     #wavesurfer: WaveSurfer | null = null;
     #stopTime: number = Number.POSITIVE_INFINITY;
@@ -49,6 +50,10 @@ export class Player {
     public constructor(state: DocumentState) {
         this.#state = state;
         this.#focusedLine$ = this.#createFocusedLine$();
+        this.#playingLine$ = combine(
+            [this.#markPlaying$, this.#focusedLine$],
+            ([markPlaying, focusedLine]) => markPlaying ? focusedLine : null,
+        );
         this.#listenValAndOperate();
         this.$ = Object.freeze({
             zoom: this.#zoom$,
@@ -66,15 +71,6 @@ export class Player {
                     }
                 },
             ),
-        });
-        state.$.playingLine.reaction(playingLine => {
-            if (playingLine) {
-                const from = playingLine.$.begin.value;
-                const to = playingLine.$.end.value;
-                this.#play(from ,to);
-            } else {
-                this.#pause();
-            }
         });
     }
 
@@ -105,11 +101,7 @@ export class Player {
     }
 
     #listenValAndOperate(): void {
-        const playingLine$ = combine(
-            [this.#markPlaying$, this.#focusedLine$],
-            ([markPlaying, focusedLine]) => markPlaying ? focusedLine : null,
-        );
-        playingLine$.reaction(playingLine => {
+        this.#playingLine$.reaction(playingLine => {
             if (playingLine) {
                 const begin = playingLine.$.begin.value;
                 const end = playingLine.$.end.value;
@@ -138,11 +130,28 @@ export class Player {
         });
     }
 
-    public clickPlay(line?: Line): void {
-        if (line && this.#focusedLine$.value != line) {
+    public clickPlay(line: Line): void {
+        if (this.#focusedLine$.value != line) {
             this.#state.selectFirstPositionOfLine(line);
         }
         this.#markPlaying$.set(true);
+    }
+
+    public clickPanelPlay(): void {
+        const focusedLine = this.#focusedLine$.value;
+        if (!focusedLine) {
+            return;
+        }
+        this.#markPlaying$.set(true);
+
+        const isPlaying = this.#isPlaying$.value;
+        const playingLine = this.#playingLine$.value;
+
+        if (!isPlaying && playingLine) {
+            const from = playingLine.$.begin.value;
+            const to = playingLine.$.end.value;
+            this.#play(from, to);
+        }
     }
 
     public clickPause(): void {

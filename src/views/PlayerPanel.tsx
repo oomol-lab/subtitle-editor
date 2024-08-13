@@ -27,7 +27,7 @@ const PlayerPanel = ({ player }: PlayerPanelProps): React.ReactNode => {
                     break;
                 }
                 case PanelPlayState.Paused: {
-                    player.clickPlay();
+                    player.clickPanelPlay();
                     break;
                 }
             }
