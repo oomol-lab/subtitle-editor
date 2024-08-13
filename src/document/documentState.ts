@@ -223,11 +223,7 @@ export class DocumentState {
 
         if (newProperties) {
             const [begin, end] = this.#updateAndGetPoints(newProperties as Range);
-            const highlightSegment = this.#findClosedToCursor(begin, end);
-
-            if (highlightSegment !== undefined) {
-                nextHighlightSegment = highlightSegment;
-            }
+            nextHighlightSegment = this.#findClosedToCursor(begin, end);
             this.#updateSelectedLines(begin, end);
         }
         if (this.#highlightSegment$.value !== nextHighlightSegment) {
@@ -259,9 +255,8 @@ export class DocumentState {
         }
     }
 
-    /** @return Segment means new closed to cursor; undefined means keeping last; null means replace with nothing */
-    #findClosedToCursor(begin: Point, end: Point): Segment | null | undefined {
-        let segment: Segment | undefined | null = undefined;
+    #findClosedToCursor(begin: Point, end: Point): Segment | null {
+        let segment: Segment | null = null;
         if (Point.equals(begin, end)) {
             segment = this.#searchSegment(begin);
             if (segment && begin.offset === 0 && begin.path[1] !== 0) {
@@ -285,9 +280,9 @@ export class DocumentState {
         return segment;
     }
 
-    #searchSegment(at: slate.Location | Span, mode?: slate.SelectionMode): Segment | undefined {
+    #searchSegment(at: slate.Location | Span, mode?: slate.SelectionMode): Segment | null {
         const result = this.#editor.nodes({ at, mode });
-        let segment: Segment | undefined;
+        let segment: Segment | null = null;
         for (const [node, _path] of result) {
             const found = Segment.get(node);
             if (found) {
