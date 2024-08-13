@@ -142,12 +142,12 @@ export class Player {
         // must set this line first.
         // "timeupdate" event will be fired immediately after wavesurfer.setTime().
         this.#stopTime = Math.min(endTime, wavesurfer.getDuration());
+        wavesurfer.setTime(beginTime);
 
         if (!this.#isPlaying) {
             wavesurfer.play();
             this.#isPlaying = true;
         }
-        wavesurfer.setTime(beginTime);
     }
 
     #pause(): void {

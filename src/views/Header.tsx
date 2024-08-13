@@ -14,7 +14,6 @@ export type HeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 
 const Header = (props: HeaderProps) => {
     const { state, player } = props;
-    const [_, setInstances] = React.useState<WavesurferInstances | null>(null);
     const onFirstDecode = React.useCallback(({ wavesurfer, regions }: WavesurferInstances) => {
         wavesurfer.zoom(state.$.zoom.value);
         player.bindWaveSurfer(wavesurfer);
@@ -27,8 +26,7 @@ const Header = (props: HeaderProps) => {
             {...props}
             className={cls(props.className, styles.container)}>
             <WavesurferView
-                url="/data/Record.wav"
-                initWavesurfer={setInstances}
+                url="/data/englishRecord.wav"
                 firstDecode={onFirstDecode} />
             <PlayerPanel player={player} />
         </header>

@@ -1,4 +1,5 @@
 import React from "react";
+import WavesurferPlayer from "@wavesurfer/react";
 import WaveSurfer from "wavesurfer.js";
 import Minimap from "wavesurfer.js/dist/plugins/minimap.esm.js";
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
@@ -12,44 +13,35 @@ export type WavesurferInstances = {
 
 export type WavesurferProps = {
     readonly url?: string;
-    readonly initWavesurfer?: (instances: WavesurferInstances) => void;
     readonly firstDecode?: (instances: WavesurferInstances) => void;
 };
 
 export const WavesurferView = (props: WavesurferProps) => {
-    const { initWavesurfer, firstDecode } = props;
-    const wavesurferRef = React.useRef<HTMLDivElement>(null);
-
-    React.useEffect(() => {
-        const regions = RegionsPlugin.create();
-        const wavesurfer = WaveSurfer.create({
-            container: wavesurferRef.current!,
-            waveColor: "rgb(200, 0, 200)",
-            progressColor: "rgb(100, 0, 100)",
-            url: props.url,
-            normalize: true,
-            interact: false,
-            plugins: [
-                regions, ...createPlugins(),
-            ],
-        });
+    const { firstDecode } = props;
+    const regions = React.useMemo(() => RegionsPlugin.create(), []);
+    const onDecode = React.useCallback((wavesurfer: WaveSurfer) => {
         const instances: WavesurferInstances = { wavesurfer, regions };
-        if (initWavesurfer) {
-            initWavesurfer(instances);
-        }
         if (firstDecode) {
             // callback in wavesurfer never print errors
             // I need do it by myself
-            wavesurfer.once("decode", () => {
-                try {
-                    firstDecode(instances);
-                } catch (error) {
-                    console.error(error);
-                }
-            });
+            try {
+                firstDecode(instances);
+            } catch (error) {
+                console.error(error);
+            }
         }
-    }, []);
-    return <div ref={wavesurferRef} />;
+    }, [regions, firstDecode]);
+
+    return (
+        <WavesurferPlayer
+            waveColor="rgb(200, 0, 200)"
+            progressColor="rgb(100, 0, 100)"
+            normalize={true}
+            interact={false}
+            url={props.url}
+            onDecode={onDecode}
+            plugins={[ regions, ...createPlugins() ]}/>
+    );
 };
 
 function createPlugins() {
