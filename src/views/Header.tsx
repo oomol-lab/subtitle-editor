@@ -25,7 +25,7 @@ const Header = (props: HeaderProps) => {
             {...props}
             className={cls(props.className, styles.container)}>
             <WavesurferView
-                url="/data/englishRecord.wav"
+                url="/data/record.wav"
                 firstDecode={onFirstDecode} />
             <PlayerPanel player={player} />
         </header>
