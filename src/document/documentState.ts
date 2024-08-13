@@ -1,7 +1,7 @@
 import slate, { Editor, Element, Point, Node, Range, Span, Text, Path } from "slate";
 
 import { Remitter, EventReceiver } from "remitter";
-import { derive, ReadonlyVal, val, Val } from "value-enhancer";
+import { compute, derive, ReadonlyVal, val, Val } from "value-enhancer";
 import { Segment } from "./segment";
 import { Line, LineElement } from "./line";
 import { FileSegment, toElement } from "./file";
@@ -11,6 +11,7 @@ export type DocumentState$ = {
     readonly lines: ReadonlyVal<readonly Line[]>;
     readonly highlightSegment: ReadonlyVal<Segment | null>;
     readonly selectedLines: ReadonlyVal<readonly Line[]>;
+    readonly firstSelectedTsLine: ReadonlyVal<Line | null>;
 };
 
 export type DocumentEvents = {
@@ -42,9 +43,22 @@ export class DocumentState {
             lines: derive(this.#lines$),
             selectedLines: derive(this.#selectedLines$),
             highlightSegment: derive(this.#highlightSegment$),
+            firstSelectedTsLine: this.#getFirstSelectedTsLine$(),
         });
         editor.apply = operation => this.#injectApply(protoApply, operation);
         Promise.resolve().then(() => this.fireEditorValueUpdating(editor.children));
+    }
+
+    #getFirstSelectedTsLine$(): ReadonlyVal<Line | null> {
+        return compute(get => {
+            let displayLine: Line | null = null;
+            for (const line of get(this.#selectedLines$)) {
+                if (get(line.$.displayTimestamp)) {
+                    displayLine = line;
+                }
+            }
+            return displayLine;
+        });
     }
 
     public get events(): EventReceiver<DocumentEvents> {

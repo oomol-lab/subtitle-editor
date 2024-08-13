@@ -12,17 +12,10 @@ export function bindWavesurfer(state: DocumentState, player: Player, wavesurfer:
             barHeight: volume,
         }),
     );
-    const firstSelectedLine$: ReadonlyVal<Line | null> = derive(state.$.selectedLines, lines => {
-        if (lines.length > 0) {
-            return lines[0];
-        } else {
-            return null;
-        }
-    });
     player.$.zoom.subscribe(zoom => {
         wavesurfer.zoom(zoom);
     });
-    firstSelectedLine$.subscribe(firstSelectedLine => {
+    state.$.firstSelectedTsLine.subscribe(firstSelectedLine => {
         if (!firstSelectedLine) {
             return;
         }

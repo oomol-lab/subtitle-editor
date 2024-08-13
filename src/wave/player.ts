@@ -1,6 +1,6 @@
 import WaveSurfer from "wavesurfer.js";
 
-import { val, derive, combine, flatten, Val, ReadonlyVal } from "value-enhancer";
+import { val, combine, flatten, Val, ReadonlyVal, compute } from "value-enhancer";
 import { DocumentState, Line } from "../document";
 import { toSeconds } from "./utils";
 
@@ -75,28 +75,16 @@ export class Player {
     }
 
     #createFocusedLine$(): ReadonlyVal<Line | null> {
-        const falseVal$ = val(false);
-        const onlySelectedLine = derive(this.#state.$.selectedLines, selectedLines => {
+        return compute(get => {
+            const selectedLines = get(this.#state.$.selectedLines);
             if (selectedLines.length !== 1) {
                 return null;
             }
-            return selectedLines[0];
-        });
-        const onlySelectedLineDisplayTimestamp = flatten(onlySelectedLine, line => {
-            if (line) {
-                return line.$.displayTimestamp;
-            } else {
-                return falseVal$;
-            }
-        });
-        return combine([onlySelectedLine, onlySelectedLineDisplayTimestamp], ([line, displayTimestamp]) => {
-            if (!line) {
+            const selectedLine = selectedLines[0];
+            if (!get(selectedLine.$.displayTimestamp)) {
                 return null;
             }
-            if (!displayTimestamp) {
-                return null;
-            }
-            return line;
+            return selectedLine;
         });
     }
 
@@ -110,19 +98,7 @@ export class Player {
                 this.#pause();
             }
         });
-        const toSeekLine$ = combine(
-            [this.#markPlaying$, this.#state.$.selectedLines],
-            ([markPlaying, selectedLines]) => {
-                if (markPlaying) {
-                    return null;
-                }
-                if (selectedLines.length === 0) {
-                    return null;
-                }
-                return selectedLines[0];
-            },
-        );
-        toSeekLine$.reaction(toSeekLine => {
+        this.#state.$.firstSelectedTsLine.reaction(toSeekLine => {
             if (toSeekLine) {
                 const time = toSeconds(toSeekLine.$.begin.value);
                 this.#wavesurfer?.setTime(time);
