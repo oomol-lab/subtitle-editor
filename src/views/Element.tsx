@@ -2,7 +2,7 @@ import styles from "./Element.module.css";
 import React from "react";
 import cls from "classnames";
 
-import { PauseOutlined, CaretRightOutlined } from "@ant-design/icons";
+import { PauseOutlined, CaretRightOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { RenderElementProps } from "slate-react";
 import { useVal } from "use-value-enhancer";
 import { Line } from "../document";
@@ -33,10 +33,13 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
         }
 
     }, [attributes.ref, line.setRef]);
+
     const onMouseEnter = React.useCallback(() => setHover(true), [setHover]);
     const onMouseLeave = React.useCallback(() => setHover(false), [setHover]);
     const onClickPlay = React.useCallback(() => {
-        if (lineState === LinePlayState.MarkPlay) {
+        if (!displayTimestamp) {
+            line.clickCreateTimestamp();
+        } else if (lineState === LinePlayState.MarkPlay) {
             line.player.clickPause();
         } else {
             line.player.clickPlay(line);
@@ -45,24 +48,27 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
 
     const begin = useVal(line.$.begin);
     const end = useVal(line.$.end);
-    const markPlay = lineState === LinePlayState.MarkPlay;
 
     let showButton = false;
+    let markPlay = false;
+    let buttonIcon: React.ReactNode = null;
 
-    if (displayTimestamp) {
-        switch (lineState) {
-            case LinePlayState.MarkPlay: {
-                showButton = true;
-                break;
-            }
-            case LinePlayState.Free: {
-                showButton = isHover;
-                break;
-            }
-            case LinePlayState.Ban: {
-                showButton = false;
-                break;
-            }
+    switch (lineState) {
+        case LinePlayState.MarkPlay: {
+            showButton = true;
+            markPlay = true;
+            buttonIcon = <PauseOutlined />;
+            break;
+        }
+        case LinePlayState.Free: {
+            showButton = isHover;
+            buttonIcon = displayTimestamp ? <CaretRightOutlined /> : <ClockCircleOutlined />;
+            break;
+        }
+        case LinePlayState.Ban: {
+            showButton = false;
+            buttonIcon = <CaretRightOutlined />;
+            break;
         }
     }
     return (
@@ -78,7 +84,7 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
                     className={styles.button}
                     style={{ visibility: showButton ? "visible" : "hidden" }}
                     onClick={onClickPlay}>
-                    {markPlay ? <PauseOutlined /> : <CaretRightOutlined />}
+                    {buttonIcon}
                 </button>
                 <div className={styles.timestamp}>
                     <span>{displayTimestamp ? formatTimestamp(begin) : ""}</span>

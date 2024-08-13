@@ -65,19 +65,27 @@ export class DocumentState {
         return this.#remitter;
     }
 
+    public get player(): Player {
+        return this.#player!;
+    }
+
+    public get editor(): Editor {
+        return this.#editor;
+    }
+
     public setEditorRef = (editorElement: HTMLDivElement | null): void => {
         this.#editorElement = editorElement;
     };
 
     public toElement(fileSegment: FileSegment): Element {
-        return toElement(this.#player!, fileSegment);
+        return toElement(this, fileSegment);
     }
 
     public bindPlayer(player: Player): Player {
         return this.#player = player;
     }
 
-    public selectFirstPositionOfLine(line: Line): void {
+    public selectWholeLine(line: Line): void {
         const rowIndex = this.#lines$.value.indexOf(line);
         const container = this.#editorElement;
 
@@ -109,10 +117,12 @@ export class DocumentState {
     public fireEditorValueUpdating(children: slate.Descendant[]): void {
         const previousLines = new Set(this.#lines$.value);
         const lines: Line[] = [];
-        for (const child of children) {
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
             const line = Line.get(child);
             if (line) {
                 lines.push(line);
+                line.markIndex(i);
                 if (previousLines.has(line)) {
                     const subChildren = (child as slate.Element).children;
                     line.fireChildrenMaybeChanged(subChildren);
@@ -177,7 +187,7 @@ export class DocumentState {
                 // I don't know why, but it works.
                 position = 0;
             }
-            const [left, right] = Line.splitElement(this.#player!, node, position);
+            const [left, right] = Line.splitElement(this, node, position);
             const nextPath = this.#nextPath(path);
 
             if (this.#waitSplitTexts) {
@@ -318,7 +328,7 @@ export class DocumentState {
         }
         if (line.checkIsLastWord(text)) {
             const lineElement: LineElement = {
-                ins: Line.empty(this.#player!),
+                ins: Line.empty(this),
                 children: [],
             };
             Promise.resolve().then(() => {

@@ -2,6 +2,7 @@ import { val, derive, combine, Val, ReadonlyVal } from "value-enhancer";
 import { Descendant, Element, Node } from "slate";
 import { Segment, SegmentLeaf } from "./segment";
 import { Player } from "../wave";
+import { DocumentState } from "./documentState";
 
 export type Line$ = {
     readonly text: ReadonlyVal<string>;
@@ -20,7 +21,7 @@ export class Line {
 
     public readonly $: Line$;
 
-    readonly #player: Player;
+    readonly #state: DocumentState;
     readonly #selected$: Val<boolean>;
     readonly #removed$: Val<boolean>;
     readonly #begin$: Val<number>;
@@ -28,9 +29,10 @@ export class Line {
     readonly #children$: Val<Descendant[]>;
 
     #refElement: HTMLDivElement | null = null;
+    #index: number = -1;
 
-    public constructor(player: Player, begin: number, end: number, children: Descendant[]) {
-        this.#player = player;
+    public constructor(state: DocumentState, begin: number, end: number, children: Descendant[]) {
+        this.#state = state;
         this.#children$ = val(children);
         this.#selected$ = val(false);
         this.#removed$ = val(false);
@@ -60,11 +62,11 @@ export class Line {
         return null;
     }
 
-    public static empty(player: Player): Line {
-        return new Line(player, Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER, []);
+    public static empty(state: DocumentState): Line {
+        return new Line(state, Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER, []);
     }
 
-    public static splitElement(player: Player, source: Element, position: number): [Element, Element] {
+    public static splitElement(state: DocumentState, source: Element, position: number): [Element, Element] {
         const line = Line.get(source);
         if (!line) {
             throw new Error("element is not a line");
@@ -88,18 +90,18 @@ export class Line {
             rightEnd = Math.max(rightBegin, Line.#getBorders(rightChildren)[1]);
         }
         const left: LineElement = {
-            ins: new Line(player, leftBegin, leftEnd, leftChildren),
+            ins: new Line(state, leftBegin, leftEnd, leftChildren),
             children: leftChildren,
         };
         const right: LineElement = {
-            ins: new Line(player, rightBegin, rightEnd, rightChildren),
+            ins: new Line(state, rightBegin, rightEnd, rightChildren),
             children: rightChildren,
         };
         return [left, right];
     }
 
     public get player(): Player {
-        return this.#player;
+        return this.#state.player;
     }
 
     public setRef = (refElement: HTMLDivElement | null): void => {
@@ -121,6 +123,30 @@ export class Line {
         this.#removed$.set(true);
     }
 
+    public clickCreateTimestamp(): void {
+        const [begin, end] = this.#getRangeOfCreated();
+        const editor = this.#state.editor;
+        const path = [this.#index];
+        const node: LineElement = {
+            ins: this,
+            children: this.#children$.value.map(child => {
+                if (!("text" in child) || Segment.get(child)) {
+                    return child;
+                }
+                const text = child.text;
+                const segment = new Segment(begin, end, text);
+
+                return { text, ins: segment };
+            }),
+        };
+        editor.removeNodes({ at: path });
+        editor.insertNode(node, { at: path });
+
+        this.#begin$.set(begin);
+        this.#end$.set(end);
+        this.#state.selectWholeLine(this);
+    }
+
     public checkIsLastWord(word: string): boolean {
         const children = this.#children$.value;
         if (children.length > 1) {
@@ -140,6 +166,10 @@ export class Line {
     public updateRange(begin: number, end: number): void {
         this.#begin$.set(begin);
         this.#end$.set(end);
+    }
+
+    public markIndex(index: number): void {
+        this.#index = index;
     }
 
     public fireChildrenMaybeChanged(children: Descendant[]): void {
@@ -184,5 +214,71 @@ export class Line {
             }
         }
         return [begin, end];
+    }
+
+    #getRangeOfCreated(): [number, number] {
+        const defaultDuration = 1500;
+        const defaultOffset = 500;
+        const audioDuration = this.#state.player.duration;
+        const minDuration = Math.min(100, audioDuration);
+        const previousLine = this.#getBrotherLine(-1);
+        const nextLine = this.#getBrotherLine(+1);
+
+        let leftBorder = 0;
+        let rightBorder = audioDuration;
+
+        if (previousLine) {
+            leftBorder = previousLine.#end$.value;
+        }
+        if (nextLine) {
+            rightBorder = nextLine.#begin$.value;
+        }
+        rightBorder = Math.max(leftBorder, rightBorder);
+
+        const gapDuration = rightBorder - leftBorder;
+
+        let begin, end: number;
+
+        if (gapDuration >= defaultDuration + 2.0 * defaultOffset) {
+            begin = leftBorder + defaultOffset;
+            end = begin + defaultDuration;
+        } else if (gapDuration >= defaultDuration) {
+            begin = (gapDuration - defaultDuration) * 0.5;
+            end = begin + defaultDuration;
+        } else if (gapDuration >= minDuration) {
+            begin = leftBorder;
+            end = rightBorder;
+        } else {
+            const center = (leftBorder + rightBorder) / 2.0;
+            begin = center - minDuration / 2.0;
+            end = center + minDuration / 2.0;
+
+            if (begin < 0) {
+                begin = 0;
+                end = minDuration;
+            } else if (end > audioDuration) {
+                begin = audioDuration - minDuration;
+                end = audioDuration;
+            }
+        }
+        return [begin, end];
+    }
+
+    #getBrotherLine(increaseIndex: number): Line | null {
+        const lines = this.#state.$.lines.value;
+        let targetLine: Line | null = null;
+        let index = this.#index + increaseIndex;
+
+        while (true) {
+            targetLine = lines[index];
+            if (!targetLine) {
+                break;
+            }
+            if (targetLine.$.displayTimestamp.value) {
+                break;
+            }
+            index += increaseIndex;
+        }
+        return targetLine;
     }
 }

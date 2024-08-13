@@ -2,7 +2,7 @@ import WaveSurfer from "wavesurfer.js";
 
 import { val, combine, flatten, Val, ReadonlyVal, compute } from "value-enhancer";
 import { DocumentState, Line } from "../document";
-import { toSeconds } from "./utils";
+import { toMilliseconds, toSeconds } from "./utils";
 
 export type PlayerParams = {
     readonly playingLine$: ReadonlyVal<Line | null>;
@@ -106,9 +106,16 @@ export class Player {
         });
     }
 
+    public get duration(): number {
+        if (!this.#wavesurfer) {
+            return 0;
+        }
+        return toMilliseconds(this.#wavesurfer.getDuration());
+    }
+
     public clickPlay(line: Line): void {
         if (this.#focusedLine$.value != line) {
-            this.#state.selectFirstPositionOfLine(line);
+            this.#state.selectWholeLine(line);
         }
         this.#markPlaying$.set(true);
     }

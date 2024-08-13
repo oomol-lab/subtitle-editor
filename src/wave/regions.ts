@@ -97,7 +97,7 @@ export function bindRegions(state: DocumentState, regions: Regions): void {
         if (!line) {
             return;
         }
-        state.selectFirstPositionOfLine(line);
+        state.selectWholeLine(line);
     }
 
     function regionOptions(
