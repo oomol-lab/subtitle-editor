@@ -14,6 +14,16 @@ export type FileSegment = {
     }[];
 };
 
+export function initElement(state: DocumentState): Element {
+    const children: Text[] = [{ text: "" }];
+    const line = new Line(state, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, children);
+    const element: LineElement = {
+        ins: line,
+        children,
+    };
+    return element;
+}
+
 export function toElement(state: DocumentState, { begin, end, text, words }: FileSegment): Element {
     let textIndex = 0;
     const children: Text[] = [];

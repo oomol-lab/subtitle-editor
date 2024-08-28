@@ -5,6 +5,8 @@
     "build": "pnpm build:main && pnpm build:browser && pnpm copy:css",
     "build:main": "rimraf lib/main && tsup",
     "build:browser": "vite build",
+    "build:dependency": "cd ../editor && pnpm build",
+    "build:dev": "pnpm build:dependency && pnpm build:browser && pnpm copy:css",
     "copy:css": "cp ../editor/lib/style.css ./lib/browser/editor.css"
   },
   "peerDependencies": {
