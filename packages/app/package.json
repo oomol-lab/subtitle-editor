@@ -1,0 +1,7 @@
+{
+  "name": "srt-editor-app",
+  "dependencies": {
+    "electron": "^32.0.1",
+    "srt-editor": "workspace:*"
+  }
+}
