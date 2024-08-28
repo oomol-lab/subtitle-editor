@@ -1,7 +1,10 @@
 {
     "cSpell.words": [
+        "iife",
         "refreshable",
+        "tsup",
         "Vals",
         "wavesurfer"
-    ]
+    ],
+    "editor.tabSize": 2
 }
