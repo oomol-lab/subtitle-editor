@@ -1,21 +1,20 @@
-import recordSRT from "../../data/record.srt.json";
+import recordSRT from "../../../../data/record.srt.json";
 import React from "react";
 import cls from "classnames";
 import styles from "./Editor.module.css";
 
-import { Slate, Editable, ReactEditor, RenderElementProps, RenderLeafProps } from "slate-react";
+import { Slate, Editable, RenderElementProps, RenderLeafProps } from "slate-react";
 import { ElementView } from "./Element";
 import { LeafView } from "./Leaf";
 import { Descendant } from "slate";
-import { DocumentState } from "../document";
+import { InnerSrtEditor } from "../srt_editor";
 
 export type EditorProps = React.HTMLAttributes<HTMLDivElement> & {
-    readonly editor: ReactEditor;
-    readonly state: DocumentState;
+    readonly inner: InnerSrtEditor;
 };
 
 const Editor = (props: EditorProps) => {
-    const { editor, state } = props;
+    const { editor, state } = props.inner;
     const renderElement = React.useCallback(
         (props: RenderElementProps) => <ElementView {...props}/>,
         [],
