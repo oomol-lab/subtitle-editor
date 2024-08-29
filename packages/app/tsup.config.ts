@@ -1,10 +1,22 @@
-import { defineConfig } from "tsup";
+import { defineConfig, Options } from "tsup";
 
-export default defineConfig({
-  entryPoints: ["src/main/index.ts"],
-  format: ["esm"],
-  outDir: "lib/main",
+const common: Options = {
+  outDir: "lib",
   sourcemap: true,
   minify: false,
   splitting: true,
-});
+};
+
+export default defineConfig([
+  {
+    ...common,
+    entryPoints: ["src/main/index.ts"],
+    format: ["esm"],
+    outDir: common.outDir + "/main",
+  }, {
+    ...common,
+    entryPoints: ["src/preload/index.ts"],
+    format: ["cjs"],
+    outDir: common.outDir + "/preload",
+  },
+]);

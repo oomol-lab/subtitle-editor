@@ -1,18 +1,27 @@
+import { readFile } from "fs/promises";
 import { join } from "path";
 import { fileURLToPath } from "url";
-import { app, BrowserWindow } from "electron";
+import { app, ipcMain, BrowserWindow, IpcMainInvokeEvent } from "electron";
 
 function createWindow() {
   const appPath = join(fileURLToPath(import.meta.url), "..", "..", "..")
   const mainWindow = new BrowserWindow({
     width: 1300,
     height: 1500,
+    webPreferences: {
+      preload: join(appPath, "lib", "preload", "index.js"),
+    },
   });
   mainWindow.loadFile(join(appPath, "lib", "browser", "index.html"));
   // mainWindow.webContents.openDevTools();
 }
 
+async function getFileContent(_: IpcMainInvokeEvent, filePath: string): Promise<string> {
+  return await readFile(filePath, "utf-8");
+}
+
 app.whenReady().then(() => {
+  ipcMain.handle("getFileContent", getFileContent);
   createWindow();
 });
 

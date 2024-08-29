@@ -1,4 +1,3 @@
-import recordSRT from "../../../../data/record.srt.json";
 import React from "react";
 import cls from "classnames";
 import styles from "./Editor.module.css";
@@ -14,7 +13,12 @@ export type EditorProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 const Editor = (props: EditorProps) => {
-    const { editor, state } = props.inner;
+    const { inner } = props;
+    const { editor, state } = inner;
+    const initialValue = React.useMemo(
+        () => inner.initialRecordJSON.map(s => state.toElement(s)),
+        [inner, state],
+    );
     const renderElement = React.useCallback(
         (props: RenderElementProps) => <ElementView {...props}/>,
         [],
@@ -34,7 +38,7 @@ const Editor = (props: EditorProps) => {
             <Slate
                 editor={editor}
                 onValueChange={onValueChange}
-                initialValue={recordSRT.map(s => state.toElement(s))}>
+                initialValue={initialValue}>
                 <Editable
                     renderElement={renderElement}
                     renderLeaf={renderLeaf}
