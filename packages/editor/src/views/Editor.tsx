@@ -10,10 +10,11 @@ import { InnerSrtEditor } from "../srt_editor";
 
 export type EditorProps = React.HTMLAttributes<HTMLDivElement> & {
     readonly inner: InnerSrtEditor;
+    readonly placeholder?: string;
 };
 
 const Editor = (props: EditorProps) => {
-    const { inner } = props;
+    const { inner, placeholder } = props;
     const { editor, state } = inner;
     const renderElement = React.useCallback(
         (props: RenderElementProps) => <ElementView {...props}/>,
@@ -38,7 +39,7 @@ const Editor = (props: EditorProps) => {
                 <Editable
                     renderElement={renderElement}
                     renderLeaf={renderLeaf}
-                    placeholder="Enter some plain text..." />
+                    placeholder={placeholder} />
             </Slate>
         </div>
     )

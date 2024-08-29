@@ -5,11 +5,11 @@ import Editor from "./Editor";
 import { useVal } from "use-value-enhancer";
 import { InnerFieldsKey, SrtEditor } from "../srt_editor";
 
-export type SrtProps = React.HTMLAttributes<HTMLDivElement> & {
+export type SrtAudioProps = React.HTMLAttributes<HTMLDivElement> & {
   readonly srtEditor: SrtEditor;
 };
 
-export const SrtAudioView: React.FC<SrtProps> = props => {
+export const SrtAudioView: React.FC<SrtAudioProps> = props => {
   const { srtEditor, children, ...restProps } = props;
   const inner = srtEditor[InnerFieldsKey]();
   const audioURL = useVal(inner.$.audioURL);
@@ -24,12 +24,18 @@ export const SrtAudioView: React.FC<SrtProps> = props => {
   );
 };
 
-export const SrtEditorView: React.FC<SrtProps> = props => {
-  const { srtEditor, ...restProps } = props;
+export type SrtEditorProps = React.HTMLAttributes<HTMLDivElement> & {
+  readonly srtEditor: SrtEditor;
+  readonly placeholder?: string;
+};
+
+export const SrtEditorView: React.FC<SrtEditorProps> = props => {
+  const { srtEditor, placeholder, ...restProps } = props;
   const inner = srtEditor[InnerFieldsKey]();
   return (
     <Editor
       {...restProps}
-      inner={inner} />
+      inner={inner}
+      placeholder={placeholder} />
   );
 };

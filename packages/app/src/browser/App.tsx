@@ -32,7 +32,8 @@ export default () => {
         </SrtAudioView>
         <SrtEditorView
           className={styles.editor}
-          srtEditor={srtEditor} />
+          srtEditor={srtEditor}
+          placeholder="Enter some plain text..." />
       </div>
     );
   }
