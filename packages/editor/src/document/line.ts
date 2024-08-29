@@ -1,5 +1,5 @@
 import { val, derive, combine, Val, ReadonlyVal } from "value-enhancer";
-import { Descendant, Element, Node } from "slate";
+import { Text, Descendant, Element, Node } from "slate";
 import { Segment, SegmentLeaf } from "./segment";
 import { Player } from "../wave";
 import { DocumentState } from "./documentState";
@@ -172,8 +172,12 @@ export class Line {
         this.#index = index;
     }
 
-    public fireChildrenMaybeChanged(children: Descendant[]): void {
+    public fireChildrenMaybeChanged(index: number, children: Descendant[]): void {
         if (this.#children$.value === children) {
+            return;
+        }
+        if (this.#isChildrenEmpty(children)) {
+            this.#state.cleanLine(index);
             return;
         }
         let begin = Number.MAX_SAFE_INTEGER;
@@ -190,6 +194,19 @@ export class Line {
         this.#begin$.set(begin);
         this.#end$.set(end);
         this.#children$.set(children);
+    }
+
+    #isChildrenEmpty(children: Descendant[]): boolean {
+        if (children.length !== 1) {
+            return false;
+        }
+        const child = children[0] as Text;
+        const segment = Segment.get(child);
+
+        if (!segment || child.text) {
+            return false;
+        }
+        return true;
     }
 
     static #getTextOfChildren(children: Descendant[]): string {

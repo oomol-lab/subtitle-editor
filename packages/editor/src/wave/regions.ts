@@ -39,10 +39,10 @@ export function bindRegions(state: DocumentState, regions: Regions): void {
             if (display) {
                 const textDom = createTextDom();
                 const options$ = combine(
-                    [line.$.begin, line.$.end, line.$.selected, editableLine$],
-                    ([begin, end, selected, editableLine]) => regionOptions(begin, end, selected, line, editableLine),
+                    [line.$.begin, line.$.end, line.$.selected, editableLine$, state.player.$.isPlaying],
+                    ([begin, end, selected, editableLine, isPlaying]) => regionOptions(begin, end, selected, line, editableLine, isPlaying),
                     {
-                        equal: (o1, o2) => o1.start === o2.start && o1.end === o2.end && o1.color === o2.color,
+                        equal: (o1, o2) => o1.start === o2.start && o1.end === o2.end && o1.color === o2.color && o1.resize === o2.resize,
                     },
                 );
                 disposers.push(
@@ -102,13 +102,13 @@ export function bindRegions(state: DocumentState, regions: Regions): void {
 
     function regionOptions(
         begin: number, end: number, selected: boolean,
-        line: Line, editableLine: Line | null,
+        line: Line, editableLine: Line | null, isPlaying: boolean,
     ): Parameters<Region["setOptions"]>[0] {
         let color: string;
         let resize = false;
 
         if (line === editableLine) {
-            resize = true;
+            resize = !isPlaying;
             color = RegionEditableColor;
         } else if (selected) {
             color = RegionSelectedColor;

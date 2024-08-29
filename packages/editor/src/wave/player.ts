@@ -1,6 +1,6 @@
 import WaveSurfer from "wavesurfer.js";
 
-import { val, combine, flatten, Val, ReadonlyVal, compute } from "value-enhancer";
+import { val, combine, derive, Val, ReadonlyVal, compute } from "value-enhancer";
 import { DocumentState, Line } from "../document";
 import { toMilliseconds, toSeconds } from "./utils";
 
@@ -13,6 +13,7 @@ export type Player$ = {
     readonly zoom: Val<number>;
     readonly volume: Val<number>;
     readonly willAlwaysPlay: Val<boolean>;
+    readonly isPlaying: ReadonlyVal<boolean>;
     readonly panelPlayState: ReadonlyVal<PanelPlayState>;
 };
 
@@ -59,6 +60,7 @@ export class Player {
             zoom: this.#zoom$,
             volume: this.#volume$,
             willAlwaysPlay: this.#willAlwaysPlay$,
+            isPlaying: derive(this.#isPlaying$),
             panelPlayState: combine(
                 [this.#focusedLine$, this.#isPlaying$],
                 ([focusedLine, isPlaying]) => {

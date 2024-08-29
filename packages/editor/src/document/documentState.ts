@@ -4,7 +4,7 @@ import { Remitter, EventReceiver } from "remitter";
 import { compute, derive, ReadonlyVal, val, Val } from "value-enhancer";
 import { Segment } from "./segment";
 import { Line, LineElement } from "./line";
-import { FileSegment, toElement } from "./file";
+import { FileSegment, initElement, toElement } from "./file";
 import { Player } from "../wave";
 
 export type DocumentState$ = {
@@ -46,8 +46,6 @@ export class DocumentState {
             firstSelectedTsLine: this.#getFirstSelectedTsLine$(),
         });
         editor.apply = operation => this.#injectApply(protoApply, operation);
-        // FIXME: cannot read first children of editor
-        setTimeout(() => this.fireEditorValueUpdating(editor.children), 10);
     }
 
     #getFirstSelectedTsLine$(): ReadonlyVal<Line | null> {
@@ -60,6 +58,19 @@ export class DocumentState {
             }
             return displayLine;
         });
+    }
+
+    public loadInitialFileSegments(fileSegments: readonly FileSegment[]): Element[] {
+        const elements: Element[] = [];
+        for (const segment of fileSegments) {
+            elements.push(this.toElement(segment));
+        }
+        if (elements.length === 0) {
+            // slate need at least one line
+            elements.push(initElement(this));
+        }
+        this.fireEditorValueUpdating(elements);
+        return elements;
     }
 
     public get events(): EventReceiver<DocumentEvents> {
@@ -84,6 +95,18 @@ export class DocumentState {
 
     public bindPlayer(player: Player): Player {
         return this.#player = player;
+    }
+
+    public cleanLine(index: number): void {
+        Promise.resolve().then(() => {
+            const lineElement: LineElement = {
+                ins: Line.empty(this),
+                children: [],
+            };
+            this.#editor.insertNodes(lineElement, { at: [index] });
+            this.#editor.removeNodes({ at: [index + 1] });
+            this.#editor.select([index]);
+        });
     }
 
     public selectWholeLine(line: Line): void {
@@ -126,7 +149,7 @@ export class DocumentState {
                 line.markIndex(i);
                 if (previousLines.has(line)) {
                     const subChildren = (child as slate.Element).children;
-                    line.fireChildrenMaybeChanged(subChildren);
+                    line.fireChildrenMaybeChanged(i, subChildren);
                     previousLines.delete(line);
                 } else {
                     this.#remitter.emit("addedLine", line);
@@ -149,11 +172,6 @@ export class DocumentState {
             case "set_selection": {
                 protoApply(operation);
                 this.#onSelectionChange(operation);
-                break;
-            }
-            case "remove_text": {
-                protoApply(operation);
-                this.#onRemoveText(operation);
                 break;
             }
             default: {
@@ -310,28 +328,5 @@ export class DocumentState {
             line.setSelected(false);
         }
         this.#selectedLines$.set(selectedLines);
-    }
-
-    #onRemoveText({ path, text }: slate.RemoveTextOperation): void {
-        if (path.length !== 2) {
-            return;
-        }
-        const lineIndex = path[0];
-        const node = Node.get(this.#editor, [lineIndex]);
-        const line = Line.get(node);
-        if (!line) {
-            return;
-        }
-        if (line.checkIsLastWord(text)) {
-            const lineElement: LineElement = {
-                ins: Line.empty(this),
-                children: [],
-            };
-            Promise.resolve().then(() => {
-                this.#editor.insertNodes(lineElement, { at: [lineIndex] });
-                this.#editor.removeNodes({ at: [lineIndex + 1] });
-                this.#editor.select([lineIndex]);
-            });
-        }
     }
 }

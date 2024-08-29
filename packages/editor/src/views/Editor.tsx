@@ -15,10 +15,6 @@ export type EditorProps = React.HTMLAttributes<HTMLDivElement> & {
 const Editor = (props: EditorProps) => {
     const { inner } = props;
     const { editor, state } = inner;
-    const initialValue = React.useMemo(
-        () => inner.initialRecordJSON.map(s => state.toElement(s)),
-        [inner, state],
-    );
     const renderElement = React.useCallback(
         (props: RenderElementProps) => <ElementView {...props}/>,
         [],
@@ -38,7 +34,7 @@ const Editor = (props: EditorProps) => {
             <Slate
                 editor={editor}
                 onValueChange={onValueChange}
-                initialValue={initialValue}>
+                initialValue={inner.getInitialElements}>
                 <Editable
                     renderElement={renderElement}
                     renderLeaf={renderLeaf}
