@@ -17,7 +17,10 @@
     "rimraf": "^6.0.1"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.4.0",
     "electron": "^32.0.1",
-    "srt-editor": "workspace:*"
+    "srt-editor": "workspace:*",
+    "use-value-enhancer": "^5.0.6",
+    "value-enhancer": "^5.4.2"
   }
 }

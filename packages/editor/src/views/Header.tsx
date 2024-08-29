@@ -1,7 +1,6 @@
 import React from "react";
 import styles from "./Header.module.css";
 import cls from "classnames";
-import PlayerPanel from "./PlayerPanel";
 import WavesurferView, { WavesurferInstances } from "./WavesurferView";
 
 import { DocumentState } from "../document";
@@ -14,7 +13,7 @@ export type HeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 const Header = (props: HeaderProps) => {
-    const { audioURL, state, player, ...restProps } = props;
+    const { audioURL, state, player, children, ...restProps } = props;
     const onFirstDecode = React.useCallback(({ wavesurfer, regions }: WavesurferInstances) => {
         player.bindWaveSurfer(wavesurfer);
         bindWavesurfer(state, player, wavesurfer);
@@ -28,7 +27,7 @@ const Header = (props: HeaderProps) => {
             <WavesurferView
                 url={audioURL}
                 firstDecode={onFirstDecode} />
-            <PlayerPanel player={player} />
+            {children}
         </header>
     );
 };

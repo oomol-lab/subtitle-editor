@@ -1,4 +1,5 @@
-export type { SrtEditorViewProps } from "./views/SrtEditorView";
+export type { SrtAudioProps, SrtEditorProps } from "./views/Export";
+export type { SrtEditor$ } from "./srt_editor";
 
-export { SrtEditor } from "./srt_editor";
-export { SrtEditorView } from "./views/SrtEditorView";
+export { SrtEditor, PlayerState } from "./srt_editor";
+export { SrtEditorView, SrtAudioView } from "./views/Export";

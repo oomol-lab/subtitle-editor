@@ -3,25 +3,12 @@ import WaveSurfer from "wavesurfer.js";
 import { val, combine, derive, Val, ReadonlyVal, compute } from "value-enhancer";
 import { DocumentState, Line } from "../document";
 import { toMilliseconds, toSeconds } from "./utils";
+import { PlayerState, SrtEditor, SrtEditor$ } from "../srt_editor";
 
 export type PlayerParams = {
     readonly playingLine$: ReadonlyVal<Line | null>;
-    readonly panelPlayState$: ReadonlyVal<PanelPlayState>;
+    readonly panelPlayState$: ReadonlyVal<PlayerState>;
 };
-
-export type Player$ = {
-    readonly zoom: Val<number>;
-    readonly volume: Val<number>;
-    readonly willAlwaysPlay: Val<boolean>;
-    readonly isPlaying: ReadonlyVal<boolean>;
-    readonly panelPlayState: ReadonlyVal<PanelPlayState>;
-};
-
-export enum PanelPlayState {
-    Disable,
-    Playing,
-    Paused,
-}
 
 export enum LinePlayState {
     MarkPlay,
@@ -31,14 +18,11 @@ export enum LinePlayState {
 
 export class Player {
 
-    public static readonly zoomInitValue = 50;
-    public static readonly volumeInitValue = 1.0;
-
-    public readonly $: Player$;
+    public readonly $: SrtEditor$;
 
     readonly #state: DocumentState;
-    readonly #zoom$: Val<number> = val(Player.zoomInitValue);
-    readonly #volume$: Val<number> = val(Player.volumeInitValue);
+    readonly #zoom$: Val<number> = val(SrtEditor.zoomInitValue);
+    readonly #volume$: Val<number> = val(SrtEditor.volumeInitValue);
     readonly #willAlwaysPlay$ = val<boolean>(false);
     readonly #markPlaying$ = val<boolean>(false);
     readonly #isPlaying$ = val<boolean>(false);
@@ -65,11 +49,11 @@ export class Player {
                 [this.#focusedLine$, this.#isPlaying$],
                 ([focusedLine, isPlaying]) => {
                     if (!focusedLine) {
-                        return PanelPlayState.Disable;
+                        return PlayerState.Disable;
                     } else if (isPlaying) {
-                        return PanelPlayState.Playing
+                        return PlayerState.Playing
                     } else {
-                        return PanelPlayState.Paused;
+                        return PlayerState.Paused;
                     }
                 },
             ),

@@ -3,46 +3,46 @@ import styles from "./PlayerPanel.module.css";
 
 import { PauseOutlined, CaretRightOutlined } from "@ant-design/icons";
 import { useVal } from "use-value-enhancer";
-import { PanelPlayState, Player } from "../wave";
 import { Val } from "value-enhancer";
+import { SrtEditor, PlayerState } from "srt-editor";
 
 export type PlayerPanelProps = {
-    readonly player: Player;
+    readonly srtEditor: SrtEditor;
 }
 
-const PlayerPanel = ({ player }: PlayerPanelProps): React.ReactNode => {
+const PlayerPanel = ({ srtEditor }: PlayerPanelProps): React.ReactNode => {
     const rateList = React.useMemo(() => [0.1, 0.25, 0.5, 0.75, 0.8, 1.0, 1.5, 2.0, 3.0, 4.0, 10.0], []);
-    const willAlwaysPlay = useVal(player.$.willAlwaysPlay);
-    const playerState = useVal(player.$.panelPlayState);
+    const willAlwaysPlay = useVal(srtEditor.$.willAlwaysPlay);
+    const playerState = useVal(srtEditor.$.panelPlayState);
 
     const onAlwaysPlayChanged: React.ChangeEventHandler<HTMLInputElement> = React.useCallback(
-        event => player.$.willAlwaysPlay.set(event.target.checked),
-        [player.$],
+        event => srtEditor.$.willAlwaysPlay.set(event.target.checked),
+        [srtEditor.$],
     );
     const onClickPlayOrPause: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
         () => {
             switch (playerState) {
-                case PanelPlayState.Playing: {
-                    player.clickPause();
+                case PlayerState.Playing: {
+                    srtEditor.pause();
                     break;
                 }
-                case PanelPlayState.Paused: {
-                    player.clickPanelPlay();
+                case PlayerState.Paused: {
+                    srtEditor.play();
                     break;
                 }
             }
         },
-        [player, playerState],
+        [srtEditor, playerState],
     );
     let showPauseIcon = false;
     let disabled = false;
 
     switch (playerState) {
-        case PanelPlayState.Disable: {
+        case PlayerState.Disable: {
             disabled = true;
             break;
         }
-        case PanelPlayState.Playing: {
+        case PlayerState.Playing: {
             showPauseIcon = true;
             break;
         }
@@ -65,16 +65,16 @@ const PlayerPanel = ({ player }: PlayerPanelProps): React.ReactNode => {
             <label className={styles.field}>
                 <span>zoom</span>
                 <SelectPercent
-                    initValue={Player.zoomInitValue}
-                    value$={player.$.zoom}
+                    initValue={SrtEditor.zoomInitValue}
+                    value$={srtEditor.$.zoom}
                     rateList={rateList}
                     reverse/>
             </label>
             <label className={styles.field}>
                 <span>volume</span>
                 <SelectPercent
-                    initValue={Player.volumeInitValue}
-                    value$={player.$.volume}
+                    initValue={SrtEditor.volumeInitValue}
+                    value$={srtEditor.$.volume}
                     rateList={rateList} />
             </label>
         </div>
