@@ -1,4 +1,4 @@
-import { createEditor, Descendant } from "slate";
+import { createEditor, Element } from "slate";
 import { withReact, ReactEditor } from "slate-react";
 import { ReadonlyVal, Val, val, derive } from "value-enhancer";
 import { FileSegment, DocumentState } from "./document";
@@ -11,26 +11,26 @@ export type InnerSrtEditor$ = {
 
 export interface InnerSrtEditor {
   readonly $: InnerSrtEditor$;
-  readonly initialRecordJSON: readonly FileSegment[];
   readonly editor: ReactEditor;
   readonly state: DocumentState;
   readonly player: Player;
-  getInitElements(): Descendant[];
+  getInitialElements(): Element[];
 }
 
 export class SrtEditor {
   readonly #editor: ReactEditor;
   readonly #state: DocumentState;
   readonly #player: Player;
-  readonly #initialRecordJSON: readonly FileSegment[];
   readonly #audioURL$: Val<string>;
 
-  public constructor(audioURL: string, recordJSON: readonly FileSegment[]) {
+  #initialElements: Element[] | null;
+
+  public constructor(audioURL: string, fileSegments: readonly FileSegment[]) {
     this.#editor = withReact(createEditor());
     this.#state = new DocumentState(this.#editor);
     this.#player = this.#state.bindPlayer(new Player(this.#state));
     this.#audioURL$ = val(audioURL);
-    this.#initialRecordJSON = recordJSON;
+    this.#initialElements = this.#state.loadInitialFileSegments(fileSegments);
   }
 
   public get fileSegments(): readonly FileSegment[] {
@@ -44,11 +44,17 @@ export class SrtEditor {
   [InnerFieldsKey](): InnerSrtEditor {
     return {
       $: { audioURL: derive(this.#audioURL$) },
-      initialRecordJSON: this.#initialRecordJSON,
       editor: this.#editor,
       state: this.#state,
       player: this.#player,
-      getInitElements: () => this.fileSegments.map(s => this.#state.toElement(s)),
+      getInitialElements: () => {
+        if (this.#initialElements === null) {
+          return [];
+        }
+        const elements = this.#initialElements;
+        this.#initialElements = null;
+        return elements;
+      },
     }
   }
 }

@@ -46,8 +46,6 @@ export class DocumentState {
             firstSelectedTsLine: this.#getFirstSelectedTsLine$(),
         });
         editor.apply = operation => this.#injectApply(protoApply, operation);
-        // FIXME: cannot read first children of editor
-        setTimeout(() => this.fireEditorValueUpdating(editor.children), 10);
     }
 
     #getFirstSelectedTsLine$(): ReadonlyVal<Line | null> {
@@ -60,6 +58,15 @@ export class DocumentState {
             }
             return displayLine;
         });
+    }
+
+    public loadInitialFileSegments(fileSegments: readonly FileSegment[]): Element[] {
+        const elements: Element[] = [];
+        for (const segment of fileSegments) {
+            elements.push(this.toElement(segment));
+        }
+        this.fireEditorValueUpdating(elements);
+        return elements;
     }
 
     public get events(): EventReceiver<DocumentEvents> {

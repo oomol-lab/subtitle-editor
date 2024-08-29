@@ -1,0 +1,51 @@
+diff --git a/dist/components/slate.d.ts b/dist/components/slate.d.ts
+index 9d984fddcc61e68eb5c740bcdaf65af32659cc1d..fd47d385825fff9907bb70ce0e597e06009eb400 100644
+--- a/dist/components/slate.d.ts
++++ b/dist/components/slate.d.ts
+@@ -7,7 +7,7 @@ import { ReactEditor } from '../plugin/react-editor';
+  */
+ export declare const Slate: (props: {
+     editor: ReactEditor;
+-    initialValue: Descendant[];
++    initialValue: () => Descendant[];
+     children: React.ReactNode;
+     onChange?: ((value: Descendant[]) => void) | undefined;
+     onSelectionChange?: ((selection: Selection) => void) | undefined;
+diff --git a/dist/index.es.js b/dist/index.es.js
+index 2cbd661a6cc3067091bd3e9fb05e6fc2f1066d93..f1519728d86b9c9e0fd1e7af8181e30c9e332570 100644
+--- a/dist/index.es.js
++++ b/dist/index.es.js
+@@ -4263,13 +4263,10 @@ var Slate = props => {
+     } = props,
+     rest = _objectWithoutProperties(props, _excluded);
+   var [context, setContext] = React.useState(() => {
+-    if (!Node.isNodeList(initialValue)) {
+-      throw new Error("[Slate] initialValue is invalid! Expected a list of elements but got: ".concat(Scrubber.stringify(initialValue)));
+-    }
+     if (!Editor.isEditor(editor)) {
+       throw new Error("[Slate] editor is invalid! You passed: ".concat(Scrubber.stringify(editor)));
+     }
+-    editor.children = initialValue;
++    editor.children = initialValue();
+     Object.assign(editor, rest);
+     return {
+       v: 0,
+diff --git a/dist/index.js b/dist/index.js
+index c680494d2246363cce064b510b3c5c85bde45f3b..8bddab1dec8e027304e5a38ca38027fb49d61610 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -4675,13 +4675,10 @@ var Slate = function Slate(props) {
+     initialValue = props.initialValue,
+     rest = _objectWithoutProperties(props, _excluded);
+   var _React$useState = React.useState(function () {
+-      if (!slate.Node.isNodeList(initialValue)) {
+-        throw new Error("[Slate] initialValue is invalid! Expected a list of elements but got: ".concat(slate.Scrubber.stringify(initialValue)));
+-      }
+       if (!slate.Editor.isEditor(editor)) {
+         throw new Error("[Slate] editor is invalid! You passed: ".concat(slate.Scrubber.stringify(editor)));
+       }
+-      editor.children = initialValue;
++      editor.children = initialValue();
+       Object.assign(editor, rest);
+       return {
+         v: 0,
