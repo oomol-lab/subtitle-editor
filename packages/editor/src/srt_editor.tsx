@@ -11,6 +11,7 @@ export type InnerSrtEditor$ = {
 
 export interface InnerSrtEditor {
   readonly $: InnerSrtEditor$;
+  readonly initialRecordJSON: readonly FileSegment[];
   readonly editor: ReactEditor;
   readonly state: DocumentState;
   readonly player: Player;
@@ -21,13 +22,15 @@ export class SrtEditor {
   readonly #editor: ReactEditor;
   readonly #state: DocumentState;
   readonly #player: Player;
+  readonly #initialRecordJSON: readonly FileSegment[];
   readonly #audioURL$: Val<string>;
 
-  public constructor(audioURL: string) {
+  public constructor(audioURL: string, recordJSON: readonly FileSegment[]) {
     this.#editor = withReact(createEditor());
     this.#state = new DocumentState(this.#editor);
     this.#player = this.#state.bindPlayer(new Player(this.#state));
     this.#audioURL$ = val(audioURL);
+    this.#initialRecordJSON = recordJSON;
   }
 
   public get fileSegments(): readonly FileSegment[] {
@@ -40,9 +43,8 @@ export class SrtEditor {
 
   [InnerFieldsKey](): InnerSrtEditor {
     return {
-      $: {
-        audioURL: derive(this.#audioURL$),
-      },
+      $: { audioURL: derive(this.#audioURL$) },
+      initialRecordJSON: this.#initialRecordJSON,
       editor: this.#editor,
       state: this.#state,
       player: this.#player,
