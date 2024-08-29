@@ -1,7 +1,8 @@
 import React from "react";
+import styles from "./App.module.css";
 
 import { FileSelector, FileSelectorProps } from "./FileSelector";
-import { SrtEditor, SrtEditorView } from "srt-editor";
+import { SrtEditor, SrtEditorView, SrtAudioView } from "srt-editor";
 
 export default () => {
   const [srtEditor, setSrtEditor] = React.useState<SrtEditor | null>(null);
@@ -21,6 +22,15 @@ export default () => {
   if (srtEditor === null) {
     return <FileSelector onCollectedFiles={onCollectedFiles} />;
   } else {
-    return <SrtEditorView srtEditor={srtEditor} />;
+    return (
+      <div className={styles.main}>
+        <SrtAudioView
+          className={styles.audio}
+          srtEditor={srtEditor} />
+        <SrtEditorView
+          className={styles.editor}
+          srtEditor={srtEditor} />
+      </div>
+    );
   }
 };
