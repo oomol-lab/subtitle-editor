@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
   entryPoints: ["src/index.ts"],
   format: ["esm"],
-  outDir: "lib",
+  outDir: "dist/lib",
   dts: {
     only: true,
   },
