@@ -8,10 +8,10 @@ const external = new Set([
 
 export default vite.defineConfig({
   define: {
-    "process.env.NODE_ENV": JSON.stringify("development"),
+    "process.env.NODE_ENV": JSON.stringify("production"),
   },
   build: {
-    outDir: "lib",
+    outDir: "dist",
     sourcemap: true,
     emptyOutDir: false,
     minify: false,
@@ -22,7 +22,8 @@ export default vite.defineConfig({
     rollupOptions: {
       external: [...external],
       output: {
-        entryFileNames: "index.js",
+        entryFileNames: "lib/index.js",
+        assetFileNames: "styles/[name].[ext]",
       },
     },
   },

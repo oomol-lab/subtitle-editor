@@ -46,7 +46,8 @@ export class DocumentState {
             firstSelectedTsLine: this.#getFirstSelectedTsLine$(),
         });
         editor.apply = operation => this.#injectApply(protoApply, operation);
-        Promise.resolve().then(() => this.fireEditorValueUpdating(editor.children));
+        // FIXME: cannot read first children of editor
+        setTimeout(() => this.fireEditorValueUpdating(editor.children), 10);
     }
 
     #getFirstSelectedTsLine$(): ReadonlyVal<Line | null> {
