@@ -7,6 +7,7 @@ async function copyPackage() {
   const editorPath = join(__filename, "..", "..");
   const packageContent = await readFile(join(editorPath, "package.json"), "utf-8");
   const packageJSON = JSON.parse(packageContent);
+  delete packageJSON.module;
   packageJSON.main = "./lib/index.js";
   packageJSON.module = "./esm/index.js";
   packageJSON.scripts = {

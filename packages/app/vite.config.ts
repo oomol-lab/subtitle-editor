@@ -11,13 +11,16 @@ export default vite.defineConfig(({ mode }) => {
     },
     build: {
       outDir: "lib/browser",
+      target: "chrome58",
       sourcemap: true,
       emptyOutDir: true,
       minify: minify,
       rollupOptions: {
+        format: "iife",
         input: "src/browser/index.tsx",
         output: {
-          entryFileNames: "index.js"
+          entryFileNames: "index.js",
+          assetFileNames: "[name].[ext]",
         },
       },
     }

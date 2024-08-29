@@ -1,13 +1,11 @@
 {
   "name": "srt-editor-app",
   "scripts": {
-    "start": "electron lib/main/index.mjs",
-    "build": "pnpm build:main && pnpm build:browser && pnpm copy:css",
+    "start": "NODE_ENV=development electron lib/main/index.mjs",
+    "dev": "vite build --watch --mode development",
+    "build": "pnpm build:main && pnpm build:browser",
     "build:main": "rimraf lib/main && tsup",
-    "build:browser": "vite build",
-    "build:dependency": "cd ../editor && pnpm build",
-    "build:dev": "pnpm build:dependency && pnpm build:browser && pnpm copy:css",
-    "copy:css": "cp ../editor/lib/style.css ./lib/browser/editor.css"
+    "build:browser": "vite build"
   },
   "peerDependencies": {
     "react": "*",

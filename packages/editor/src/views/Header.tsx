@@ -14,7 +14,7 @@ export type HeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 const Header = (props: HeaderProps) => {
-    const { audioURL, state, player } = props;
+    const { audioURL, state, player, ...restProps } = props;
     const onFirstDecode = React.useCallback(({ wavesurfer, regions }: WavesurferInstances) => {
         player.bindWaveSurfer(wavesurfer);
         bindWavesurfer(state, player, wavesurfer);
@@ -23,7 +23,7 @@ const Header = (props: HeaderProps) => {
 
     return (
         <header
-            {...props}
+            {...restProps}
             className={cls(props.className, styles.container)}>
             <WavesurferView
                 url={audioURL}

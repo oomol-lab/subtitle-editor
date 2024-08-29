@@ -6,14 +6,17 @@ import { app, ipcMain, BrowserWindow, IpcMainInvokeEvent } from "electron";
 function createWindow() {
   const appPath = join(fileURLToPath(import.meta.url), "..", "..", "..")
   const mainWindow = new BrowserWindow({
-    width: 1300,
+    width: 1600,
     height: 1500,
     webPreferences: {
       preload: join(appPath, "lib", "preload", "index.js"),
     },
   });
   mainWindow.loadFile(join(appPath, "lib", "browser", "index.html"));
-  // mainWindow.webContents.openDevTools();
+
+  if (process.env.NODE_ENV === "development") {
+    mainWindow.webContents.openDevTools();
+  }
 }
 
 async function getFileContent(_: IpcMainInvokeEvent, filePath: string): Promise<string> {
