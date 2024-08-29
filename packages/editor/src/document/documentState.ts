@@ -97,6 +97,18 @@ export class DocumentState {
         return this.#player = player;
     }
 
+    public cleanLine(index: number): void {
+        Promise.resolve().then(() => {
+            const lineElement: LineElement = {
+                ins: Line.empty(this),
+                children: [],
+            };
+            this.#editor.insertNodes(lineElement, { at: [index] });
+            this.#editor.removeNodes({ at: [index + 1] });
+            this.#editor.select([index]);
+        });
+    }
+
     public selectWholeLine(line: Line): void {
         const rowIndex = this.#lines$.value.indexOf(line);
         const container = this.#editorElement;
@@ -137,7 +149,7 @@ export class DocumentState {
                 line.markIndex(i);
                 if (previousLines.has(line)) {
                     const subChildren = (child as slate.Element).children;
-                    line.fireChildrenMaybeChanged(subChildren);
+                    line.fireChildrenMaybeChanged(i, subChildren);
                     previousLines.delete(line);
                 } else {
                     this.#remitter.emit("addedLine", line);
@@ -160,11 +172,6 @@ export class DocumentState {
             case "set_selection": {
                 protoApply(operation);
                 this.#onSelectionChange(operation);
-                break;
-            }
-            case "remove_text": {
-                protoApply(operation);
-                this.#onRemoveText(operation);
                 break;
             }
             default: {
@@ -321,28 +328,5 @@ export class DocumentState {
             line.setSelected(false);
         }
         this.#selectedLines$.set(selectedLines);
-    }
-
-    #onRemoveText({ path, text }: slate.RemoveTextOperation): void {
-        if (path.length !== 2) {
-            return;
-        }
-        const lineIndex = path[0];
-        const node = Node.get(this.#editor, [lineIndex]);
-        const line = Line.get(node);
-        if (!line) {
-            return;
-        }
-        if (line.checkIsLastWord(text)) {
-            const lineElement: LineElement = {
-                ins: Line.empty(this),
-                children: [],
-            };
-            Promise.resolve().then(() => {
-                this.#editor.insertNodes(lineElement, { at: [lineIndex] });
-                this.#editor.removeNodes({ at: [lineIndex + 1] });
-                this.#editor.select([lineIndex]);
-            });
-        }
     }
 }
