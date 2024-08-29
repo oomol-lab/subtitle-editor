@@ -16,7 +16,12 @@ export type FileSegment = {
 
 export function initElement(state: DocumentState): Element {
     const children: Text[] = [{ text: "" }];
-    const line = new Line(state, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, children);
+    const line = new Line(
+        state,
+        Number.MAX_SAFE_INTEGER,
+        Number.MIN_SAFE_INTEGER,
+        children,
+    );
     const element: LineElement = {
         ins: line,
         children,

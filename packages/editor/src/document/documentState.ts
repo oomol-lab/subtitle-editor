@@ -4,7 +4,7 @@ import { Remitter, EventReceiver } from "remitter";
 import { compute, derive, ReadonlyVal, val, Val } from "value-enhancer";
 import { Segment } from "./segment";
 import { Line, LineElement } from "./line";
-import { FileSegment, toElement } from "./file";
+import { FileSegment, initElement, toElement } from "./file";
 import { Player } from "../wave";
 
 export type DocumentState$ = {
@@ -64,6 +64,10 @@ export class DocumentState {
         const elements: Element[] = [];
         for (const segment of fileSegments) {
             elements.push(this.toElement(segment));
+        }
+        if (elements.length === 0) {
+            // slate need at least one line
+            elements.push(initElement(this));
         }
         this.fireEditorValueUpdating(elements);
         return elements;
