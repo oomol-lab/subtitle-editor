@@ -17,7 +17,24 @@ export interface InnerSrtEditor {
   getInitialElements(): Element[];
 }
 
+export type SrtEditor$ = {
+  readonly zoom: Val<number>;
+  readonly volume: Val<number>;
+  readonly willAlwaysPlay: Val<boolean>;
+  readonly isPlaying: ReadonlyVal<boolean>;
+  readonly panelPlayState: ReadonlyVal<PlayerState>;
+};
+
+export enum PlayerState {
+  Disable,
+  Playing,
+  Paused,
+}
+
 export class SrtEditor {
+  public static readonly zoomInitValue = 50;
+  public static readonly volumeInitValue = 1.0;
+
   readonly #editor: ReactEditor;
   readonly #state: DocumentState;
   readonly #player: Player;
@@ -33,12 +50,24 @@ export class SrtEditor {
     this.#initialElements = this.#state.loadInitialFileSegments(fileSegments);
   }
 
+  public get $(): SrtEditor$ {
+    return this.#player.$;
+  }
+
   public get fileSegments(): readonly FileSegment[] {
     return [];
   }
 
   public set fileSegments(segments: readonly FileSegment[]) {
     this.#editor.insertFragment(segments.map(s => this.#state.toElement(s)));
+  }
+
+  public play(): void {
+    this.#player.clickPanelPlay();
+  }
+
+  public pause(): void {
+    this.#player.clickPause();
   }
 
   [InnerFieldsKey](): InnerSrtEditor {

@@ -1,4 +1,5 @@
 import React from "react";
+import PlayerPanel from "./PlayerPanel";
 import styles from "./App.module.css";
 
 import { FileSelector, FileSelectorProps } from "./FileSelector";
@@ -26,7 +27,9 @@ export default () => {
       <div className={styles.main}>
         <SrtAudioView
           className={styles.audio}
-          srtEditor={srtEditor} />
+          srtEditor={srtEditor}>
+          <PlayerPanel srtEditor={srtEditor}/>
+        </SrtAudioView>
         <SrtEditorView
           className={styles.editor}
           srtEditor={srtEditor} />

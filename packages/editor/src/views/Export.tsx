@@ -10,7 +10,7 @@ export type SrtProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 export const SrtAudioView: React.FC<SrtProps> = props => {
-  const { srtEditor, ...restProps } = props;
+  const { srtEditor, children, ...restProps } = props;
   const inner = srtEditor[InnerFieldsKey]();
   const audioURL = useVal(inner.$.audioURL);
   return (
@@ -18,7 +18,9 @@ export const SrtAudioView: React.FC<SrtProps> = props => {
       {...restProps}
       audioURL={audioURL}
       state={inner.state}
-      player={inner.player} />
+      player={inner.player}>
+      {children}
+    </Header>
   );
 };
 
