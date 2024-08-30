@@ -4,7 +4,7 @@ import { Remitter, EventReceiver } from "remitter";
 import { compute, derive, ReadonlyVal, val, Val } from "value-enhancer";
 import { Segment } from "./segment";
 import { Line, LineElement } from "./line";
-import { FileSegment, initElement, toElement } from "./file";
+import { SrtLine, initElement, toElement } from "./srtLine";
 import { Player } from "../wave";
 
 export type DocumentState$ = {
@@ -22,6 +22,7 @@ export type DocumentEvents = {
 export class DocumentState {
 
     public readonly $: DocumentState$;
+    public onUpdated: (() => void) | null = null;
 
     readonly #editor: Editor;
     readonly #remitter: Remitter<DocumentEvents>;
@@ -60,16 +61,16 @@ export class DocumentState {
         });
     }
 
-    public loadInitialFileSegments(fileSegments: readonly FileSegment[]): Element[] {
+    public loadInitialFileSegments(srtLines: readonly SrtLine[]): Element[] {
         const elements: Element[] = [];
-        for (const segment of fileSegments) {
-            elements.push(this.toElement(segment));
+        for (const line of srtLines) {
+            elements.push(this.toElement(line));
         }
         if (elements.length === 0) {
             // slate need at least one line
             elements.push(initElement(this));
         }
-        this.fireEditorValueUpdating(elements);
+        this.#syncLinesWithChildren(elements);
         return elements;
     }
 
@@ -89,8 +90,8 @@ export class DocumentState {
         this.#editorElement = editorElement;
     };
 
-    public toElement(fileSegment: FileSegment): Element {
-        return toElement(this, fileSegment);
+    public toElement(srtLine: SrtLine): Element {
+        return toElement(this, srtLine);
     }
 
     public bindPlayer(player: Player): Player {
@@ -139,6 +140,11 @@ export class DocumentState {
     }
 
     public fireEditorValueUpdating(children: slate.Descendant[]): void {
+        this.#syncLinesWithChildren(children);
+        this.onUpdated?.();
+    }
+
+    #syncLinesWithChildren(children: slate.Descendant[]): void {
         const previousLines = new Set(this.#lines$.value);
         const lines: Line[] = [];
         for (let i = 0; i < children.length; i++) {

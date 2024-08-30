@@ -1,4 +1,4 @@
-import { readFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import { app, ipcMain, BrowserWindow, IpcMainInvokeEvent } from "electron";
@@ -23,8 +23,13 @@ async function getFileContent(_: IpcMainInvokeEvent, filePath: string): Promise<
   return await readFile(filePath, "utf-8");
 }
 
+async function setFileContent(_: IpcMainInvokeEvent, filePath: string, fileContent: string): Promise<void> {
+  return await writeFile(filePath, fileContent, "utf-8");
+}
+
 app.whenReady().then(() => {
   ipcMain.handle("getFileContent", getFileContent);
+  ipcMain.handle("setFileContent", setFileContent);
   createWindow();
 });
 

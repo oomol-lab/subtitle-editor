@@ -1,5 +1,5 @@
 {
-  "name": "srt-editor-app",
+  "name": "subtitle-editor-app",
   "scripts": {
     "start": "NODE_ENV=development electron lib/main/index.mjs",
     "dev": "vite build --watch --mode development",
@@ -13,6 +13,7 @@
     "react-dom": "*"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "rimraf": "^6.0.1"
@@ -21,7 +22,8 @@
     "@ant-design/icons": "^5.4.0",
     "antd": "^5.20.3",
     "electron": "^32.0.1",
-    "srt-editor": "workspace:*",
+    "js-yaml": "^4.1.0",
+    "subtitle-editor": "workspace:*",
     "use-value-enhancer": "^5.0.6",
     "value-enhancer": "^5.4.2"
   }

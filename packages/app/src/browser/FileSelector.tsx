@@ -31,7 +31,7 @@ export const FileSelector = ({ onCollectedFiles }: FileSelectorProps): React.Rea
         <label>SRT JSON File:</label>
         <input
           type="file"
-          accept=".json"
+          accept=".json, .yaml, .yml, .srt"
           onChange={onSrtFileChange} />
       </div>
     </div>
