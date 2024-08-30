@@ -1,6 +1,6 @@
 import React from "react";
 import cls from "classnames";
-import styles from "./Editor.module.css";
+import styles from "./Editor.module.less";
 
 import { Slate, Editable, RenderElementProps, RenderLeafProps } from "slate-react";
 import { ElementView } from "./Element";

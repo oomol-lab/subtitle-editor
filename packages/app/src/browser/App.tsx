@@ -1,6 +1,6 @@
 import React from "react";
 import PlayerPanel from "./PlayerPanel";
-import styles from "./App.module.css";
+import styles from "./App.module.less";
 
 import { FileSelector, FileSelectorProps } from "./FileSelector";
 import { SrtEditor, SrtEditorView, SrtAudioView } from "srt-editor";

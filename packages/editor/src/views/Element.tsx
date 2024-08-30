@@ -1,4 +1,4 @@
-import styles from "./Element.module.css";
+import styles from "./Element.module.less";
 import React from "react";
 import cls from "classnames";
 

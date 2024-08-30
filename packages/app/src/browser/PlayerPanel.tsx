@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./PlayerPanel.module.css";
+import styles from "./PlayerPanel.module.less";
 
 import { PauseOutlined, CaretRightOutlined } from "@ant-design/icons";
 import { useVal } from "use-value-enhancer";
