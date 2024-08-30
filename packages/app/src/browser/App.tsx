@@ -4,6 +4,7 @@ import styles from "./App.module.less";
 
 import { FileSelector, FileSelectorProps } from "./FileSelector";
 import { SrtEditor, SrtEditorView, SrtAudioView } from "srt-editor";
+import { parseSrtFilePath } from "./fileParser";
 
 export default () => {
   const [srtEditor, setSrtEditor] = React.useState<SrtEditor | null>(null);
@@ -11,9 +12,8 @@ export default () => {
   const onCollectedFiles: FileSelectorProps["onCollectedFiles"] = React.useCallback(
     async ({ audioFilePath, srtFilePath }) => {
       try {
-        const srtContent = await electronAPI.getContentOfFile(srtFilePath);
-        const srtJSON = JSON.parse(srtContent);
-        const srtEditor = new SrtEditor(audioFilePath, srtJSON);
+        const srtLines = await parseSrtFilePath(srtFilePath)
+        const srtEditor = new SrtEditor(audioFilePath, srtLines);
         setSrtEditor(srtEditor);
         setSrtFilePath(srtFilePath);
       } catch (error) {

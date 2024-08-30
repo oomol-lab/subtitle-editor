@@ -1,30 +1,31 @@
 import { SrtLine } from "./srtLine";
 
 export function toSrtLines(srtFile: string): SrtLine[] {
-    const srtLines: SrtLine[] = [];
+  const srtLines: SrtLine[] = [];
 
-    let begin: number = 0;
-    let end: number = 0;
-    let isText = false;
+  let begin: number = 0;
+  let end: number = 0;
+  let isText = false;
 
-    for (let line of srtFile.split("\n")) {
-      line = line.trim();
-      if (line === "") {
-        continue;
-      }
-      if (isText) {
-        srtLines.push({ begin, end, text: line });
-        isText = false;
-      } else {
-        const match = line.match(/^(\d+):(\d+):(\d+),(\d+) --> (\d+):(\d+):(\d+),(\d+)$/);
-        if (match) {
-          begin = parseInt(match[1]) * 3600 + parseInt(match[2]) * 60 + parseInt(match[3]) + parseInt(match[4]);
-          end = parseInt(match[5]) * 3600 + parseInt(match[6]) * 60 + parseInt(match[7]) + parseInt(match[8]);
-          isText = true;
-        }
+  for (let line of srtFile.split("\n")) {
+    line = line.trim();
+    if (line === "") {
+      continue;
+    }
+    if (isText) {
+      srtLines.push({ begin, end, text: line });
+      isText = false;
+    } else {
+      const match = line.match(/^(\d+):(\d+):(\d+),(\d+) --> (\d+):(\d+):(\d+),(\d+)$/);
+      if (match) {
+        const [_, hours1, minutes1, seconds1, milliseconds1, hours2, minutes2, seconds2, milliseconds2] = match;
+        begin = timestampToMilliseconds(hours1, minutes1, seconds1, milliseconds1);
+        end = timestampToMilliseconds(hours2, minutes2, seconds2, milliseconds2);
+        isText = true;
       }
     }
-    return srtLines;
+  }
+  return srtLines;
 }
 
 export function toSrtFileContent(srtLines: SrtLine[]): string {
@@ -47,4 +48,16 @@ function millisecondsToTimestamp(milliseconds: number): string {
   const seconds = (milliseconds % 60).toString().padStart(2, "0");
   const ms = (milliseconds % 1).toFixed(3).slice(2).padStart(3, "0");
   return `${hours}:${minutes}:${seconds},${ms}`;
+}
+
+function timestampToMilliseconds(hours: string, minutes: string, seconds: string, milliseconds: string): number {
+  let sum: number = 0;
+  sum += parseInt(hours, 10);
+  sum *= 60;
+  sum += parseInt(minutes, 10);
+  sum *= 60;
+  sum += parseInt(seconds, 10);
+  sum *= 1000;
+  sum += parseInt(milliseconds, 10);
+  return sum;
 }
