@@ -1,26 +1,31 @@
 import React from "react";
-import Header from "./Header";
 import Editor from "./Editor";
+import WavesurferView, { WavesurferInstances } from "./WavesurferView";
 
 import { useVal } from "use-value-enhancer";
 import { InnerFieldsKey, SrtEditor } from "../srt_editor";
+import { bindRegions, bindWavesurfer } from "../wave";
 
-export type SrtAudioProps = React.HTMLAttributes<HTMLDivElement> & {
+export type SrtAudioProps = {
   readonly srtEditor: SrtEditor;
 };
 
 export const SrtAudioView: React.FC<SrtAudioProps> = props => {
-  const { srtEditor, children, ...restProps } = props;
+  const { srtEditor } = props;
   const inner = srtEditor[InnerFieldsKey]();
   const audioURL = useVal(inner.$.audioURL);
+
+  const onFirstDecode = React.useCallback(({ wavesurfer, regions }: WavesurferInstances) => {
+    const { state, player } = inner;
+    player.bindWaveSurfer(wavesurfer);
+    bindWavesurfer(state, player, wavesurfer);
+    bindRegions(state, regions);
+  }, [inner]);
+
   return (
-    <Header
-      {...restProps}
-      audioURL={audioURL}
-      state={inner.state}
-      player={inner.player}>
-      {children}
-    </Header>
+    <WavesurferView
+      url={audioURL}
+      firstDecode={onFirstDecode} />
   );
 };
 

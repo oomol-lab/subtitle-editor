@@ -14,7 +14,7 @@ export type EditorProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 const Editor = (props: EditorProps) => {
-    const { inner, placeholder } = props;
+    const { inner, placeholder, ...restProps } = props;
     const { editor, state } = inner;
     const renderElement = React.useCallback(
         (props: RenderElementProps) => <ElementView {...props}/>,
@@ -29,9 +29,9 @@ const Editor = (props: EditorProps) => {
         [state],
     );
     return (
-        <div {...props}
+        <div {...restProps}
             ref={state.setEditorRef}
-            className={cls(styles.container, props.className)}>
+            className={cls(styles.container, restProps.className)}>
             <Slate
                 editor={editor}
                 onValueChange={onValueChange}

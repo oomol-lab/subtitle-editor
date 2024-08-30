@@ -25,11 +25,10 @@ export default () => {
   } else {
     return (
       <div className={styles.main}>
-        <SrtAudioView
-          className={styles.audio}
-          srtEditor={srtEditor}>
-          <PlayerPanel srtEditor={srtEditor}/>
-        </SrtAudioView>
+        <header className={styles.header}>
+          <SrtAudioView srtEditor={srtEditor} />
+          <PlayerPanel srtEditor={srtEditor} />
+        </header>
         <SrtEditorView
           className={styles.editor}
           srtEditor={srtEditor}
