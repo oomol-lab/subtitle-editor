@@ -8,10 +8,11 @@ import { bindRegions, bindWavesurfer } from "../wave";
 
 export type SrtAudioProps = {
   readonly srtEditor: SrtEditor;
+  readonly onDecoded?: () => void;
 };
 
 export const SrtAudioView: React.FC<SrtAudioProps> = props => {
-  const { srtEditor } = props;
+  const { srtEditor, onDecoded } = props;
   const inner = srtEditor[InnerFieldsKey]();
   const audioURL = useVal(inner.$.audioURL);
 
@@ -20,7 +21,8 @@ export const SrtAudioView: React.FC<SrtAudioProps> = props => {
     player.bindWaveSurfer(wavesurfer);
     bindWavesurfer(state, player, wavesurfer);
     bindRegions(state, regions);
-  }, [inner]);
+    onDecoded?.();
+  }, [inner, onDecoded]);
 
   return (
     <WavesurferView
