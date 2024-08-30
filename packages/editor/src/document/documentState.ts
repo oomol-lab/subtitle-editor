@@ -4,7 +4,7 @@ import { Remitter, EventReceiver } from "remitter";
 import { compute, derive, ReadonlyVal, val, Val } from "value-enhancer";
 import { Segment } from "./segment";
 import { Line, LineElement } from "./line";
-import { FileSegment, initElement, toElement } from "./file";
+import { SrtLine, initElement, toElement } from "./srtLine";
 import { Player } from "../wave";
 
 export type DocumentState$ = {
@@ -60,7 +60,7 @@ export class DocumentState {
         });
     }
 
-    public loadInitialFileSegments(fileSegments: readonly FileSegment[]): Element[] {
+    public loadInitialFileSegments(fileSegments: readonly SrtLine[]): Element[] {
         const elements: Element[] = [];
         for (const segment of fileSegments) {
             elements.push(this.toElement(segment));
@@ -89,7 +89,7 @@ export class DocumentState {
         this.#editorElement = editorElement;
     };
 
-    public toElement(fileSegment: FileSegment): Element {
+    public toElement(fileSegment: SrtLine): Element {
         return toElement(this, fileSegment);
     }
 

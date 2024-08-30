@@ -1,7 +1,7 @@
 import { createEditor, Element } from "slate";
 import { withReact, ReactEditor } from "slate-react";
 import { ReadonlyVal, Val, val, derive } from "value-enhancer";
-import { FileSegment, DocumentState } from "./document";
+import { SrtLine, DocumentState } from "./document";
 import { Player } from "./wave";
 
 export const InnerFieldsKey = Symbol("InnerFieldsKey");
@@ -42,7 +42,7 @@ export class SrtEditor {
 
   #initialElements: Element[] | null;
 
-  public constructor(audioURL: string, fileSegments: readonly FileSegment[]) {
+  public constructor(audioURL: string, fileSegments: readonly SrtLine[]) {
     this.#editor = withReact(createEditor());
     this.#state = new DocumentState(this.#editor);
     this.#player = this.#state.bindPlayer(new Player(this.#state));
@@ -54,11 +54,11 @@ export class SrtEditor {
     return this.#player.$;
   }
 
-  public get fileSegments(): readonly FileSegment[] {
+  public get fileSegments(): readonly SrtLine[] {
     return [];
   }
 
-  public set fileSegments(segments: readonly FileSegment[]) {
+  public set fileSegments(segments: readonly SrtLine[]) {
     this.#editor.insertFragment(segments.map(s => this.#state.toElement(s)));
   }
 

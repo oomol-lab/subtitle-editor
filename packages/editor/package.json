@@ -10,8 +10,12 @@
     "ts-check": "tsc --noEmit",
     "build": "pnpm clean && pnpm dts && vite build && node scripts/copy-package.mjs"
   },
-  "files": ["lib", "styles"],
+  "files": [
+    "lib",
+    "styles"
+  ],
   "devDependencies": {
+    "@types/jsonschema": "^1.1.1",
     "@types/react": "^18.2.66",
     "rimraf": "^6.0.1"
   },
@@ -22,6 +26,7 @@
     "@ant-design/icons": "^5.4.0",
     "@wavesurfer/react": "^1.0.7",
     "classnames": "^2.5.1",
+    "jsonschema": "^1.4.1",
     "remitter": "^0.4.3",
     "slate": "^0.103.0",
     "slate-react": "^0.107.1",

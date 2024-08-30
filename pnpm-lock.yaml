@@ -86,6 +86,9 @@ importers:
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
+      jsonschema:
+        specifier: ^1.4.1
+        version: 1.4.1
       react:
         specifier: '*'
         version: 18.3.1
@@ -108,6 +111,9 @@ importers:
         specifier: ^7.8.2
         version: 7.8.4
     devDependencies:
+      '@types/jsonschema':
+        specifier: ^1.1.1
+        version: 1.1.1
       '@types/react':
         specifier: ^18.2.66
         version: 18.3.4
@@ -1018,6 +1024,13 @@ packages:
     resolution: {integrity: sha512-RvC8KMw5BCac1NvRRyaHgMMEtBaZ6wh0pyPTBu7izn4Sj/AX9Y4aXU5c7rX8PnM/knsuUpC1IeoBkANtxBypsQ==}
     dev: false
 
+  /@types/jsonschema@1.1.1:
+    resolution: {integrity: sha512-JPP6H7/h/uXzAow+NbD/jqA3tA1Fj3u2C0KiFAlQ+rtl2QhozxMEz0aPjKnr4YyAB8/6s0Xm9UPa0fFUB0y1OA==}
+    deprecated: This is a stub types definition for jsonschema (https://github.com/tdegrunt/jsonschema). jsonschema provides its own type definitions, so you don't need @types/jsonschema installed!
+    dependencies:
+      jsonschema: 1.4.1
+    dev: true
+
   /@types/keyv@3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
@@ -1921,6 +1934,9 @@ packages:
     optionalDependencies:
       graceful-fs: 4.2.11
     dev: false
+
+  /jsonschema@1.4.1:
+    resolution: {integrity: sha512-S6cATIPVv1z0IlxdN+zUk5EPjkGCdnhN4wVSBlvoUO1tOLJootbo9CquNJmbIh4yikWHiUedhRYrNPn1arpEmQ==}
 
   /keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
