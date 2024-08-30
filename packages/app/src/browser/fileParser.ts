@@ -1,5 +1,5 @@
 import { dump, load } from "js-yaml";
-import { SrtLine, toSrtFileContent, toSrtLines } from "srt-editor";
+import { SrtLine, toSrtFileContent, toSrtLines } from "subtitle-editor";
 
 export async function parseSrtFilePath(path: string): Promise<SrtLine[]> {
   switch (getExtName(path).toLocaleLowerCase()) {

@@ -3,7 +3,7 @@ import PlayerPanel from "./PlayerPanel";
 import styles from "./App.module.less";
 
 import { FileSelector, FileSelectorProps } from "./FileSelector";
-import { SrtEditor, SrtEditorView, SrtAudioView } from "srt-editor";
+import { SrtEditor, SrtEditorView, SrtAudioView } from "subtitle-editor";
 import { parseSrtFilePath } from "./fileParser";
 
 export default () => {

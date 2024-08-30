@@ -7,7 +7,7 @@ import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { PauseOutlined, CaretRightOutlined } from "@ant-design/icons";
 import { useVal } from "use-value-enhancer";
 import { Val } from "value-enhancer";
-import { SrtEditor, PlayerState } from "srt-editor";
+import { SrtEditor, PlayerState } from "subtitle-editor";
 
 export type PlayerPanelProps = {
     readonly srtFilePath: string;

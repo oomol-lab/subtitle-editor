@@ -4,7 +4,7 @@ import styles from "./SavePanel.module.less";
 import { message, Button } from "antd";
 import { val, derive } from "value-enhancer";
 import { useVal } from "use-value-enhancer";
-import { SrtEditor } from "srt-editor";
+import { SrtEditor } from "subtitle-editor";
 import { saveToFilePath } from "./fileParser";
 
 export type SavePanelProps = React.HTMLAttributes<HTMLDivElement> & {
