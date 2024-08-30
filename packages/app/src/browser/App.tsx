@@ -1,6 +1,6 @@
 import React from "react";
 import PlayerPanel from "./PlayerPanel";
-import styles from "./App.module.css";
+import styles from "./App.module.less";
 
 import { FileSelector, FileSelectorProps } from "./FileSelector";
 import { SrtEditor, SrtEditorView, SrtAudioView } from "srt-editor";
@@ -25,11 +25,10 @@ export default () => {
   } else {
     return (
       <div className={styles.main}>
-        <SrtAudioView
-          className={styles.audio}
-          srtEditor={srtEditor}>
-          <PlayerPanel srtEditor={srtEditor}/>
-        </SrtAudioView>
+        <header className={styles.header}>
+          <SrtAudioView srtEditor={srtEditor} />
+          <PlayerPanel srtEditor={srtEditor} />
+        </header>
         <SrtEditorView
           className={styles.editor}
           srtEditor={srtEditor}

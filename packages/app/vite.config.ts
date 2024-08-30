@@ -9,6 +9,13 @@ export default vite.defineConfig(({ mode }) => {
     define: {
       "process.env.NODE_ENV": JSON.stringify(mode),
     },
+    css: {
+      preprocessorOptions: {
+        less: {
+          math: "always",
+        },
+      },
+    },
     build: {
       outDir: "lib/browser",
       target: "chrome58",

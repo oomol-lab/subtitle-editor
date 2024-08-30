@@ -1,6 +1,8 @@
 import React from "react";
-import styles from "./PlayerPanel.module.css";
+import styles from "./PlayerPanel.module.less";
 
+import { Button, Checkbox, Select } from "antd";
+import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { PauseOutlined, CaretRightOutlined } from "@ant-design/icons";
 import { useVal } from "use-value-enhancer";
 import { Val } from "value-enhancer";
@@ -15,8 +17,8 @@ const PlayerPanel = ({ srtEditor }: PlayerPanelProps): React.ReactNode => {
     const willAlwaysPlay = useVal(srtEditor.$.willAlwaysPlay);
     const playerState = useVal(srtEditor.$.panelPlayState);
 
-    const onAlwaysPlayChanged: React.ChangeEventHandler<HTMLInputElement> = React.useCallback(
-        event => srtEditor.$.willAlwaysPlay.set(event.target.checked),
+    const onAlwaysPlayChanged = React.useCallback(
+        (event: CheckboxChangeEvent) => srtEditor.$.willAlwaysPlay.set(event.target.checked),
         [srtEditor.$],
     );
     const onClickPlayOrPause: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
@@ -49,19 +51,18 @@ const PlayerPanel = ({ srtEditor }: PlayerPanelProps): React.ReactNode => {
     }
     return (
         <div className={styles.container}>
-            <button
+            <Button
+                className={styles.field}
+                shape="circle"
                 disabled={disabled}
-                className={styles.button}
-                onClick={onClickPlayOrPause}>
-                {showPauseIcon ? <PauseOutlined /> : <CaretRightOutlined />}
-            </button>
-            <label className={styles.field}>
-                <input
-                    type="checkbox"
-                    checked={willAlwaysPlay}
-                    onChange={onAlwaysPlayChanged}/>
-                <span>always play</span>
-            </label>
+                icon={showPauseIcon ? <PauseOutlined /> : <CaretRightOutlined />}
+                onClick={onClickPlayOrPause} />
+            <Checkbox
+                className={styles.field}
+                checked={willAlwaysPlay}
+                onChange={onAlwaysPlayChanged}>
+                always play
+            </Checkbox>
             <label className={styles.field}>
                 <span>zoom</span>
                 <SelectPercent
@@ -96,8 +97,7 @@ const SelectPercent = ({ initValue, value$, rateList, reverse }: SelectPercentPr
         label: `${Math.round(rate * 100)}%`,
     })), [rateList, reverse]);
 
-    const onChange = React.useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-        const value = Number.parseFloat(event.target.value);
+    const onChange = React.useCallback((value: number) => {
         value$.set(value);
     }, [value$]);
 
@@ -122,19 +122,15 @@ const SelectPercent = ({ initValue, value$, rateList, reverse }: SelectPercentPr
             }
         }
     }
-
     return (
-        <select
+        <Select
+            className={styles.select}
             value={selectValue}
-            onChange={onChange}>
-            {options.map(o => (
-                <option
-                    key={o.key}
-                    value={`${o.value}`}>
-                    {o.label}
-                </option>
-            ))}
-        </select>
+            onChange={onChange}
+            options={options.map(o => ({
+                label: <span>{o.label}</span>,
+                value: o.value,
+            }))} />
     );
 };
 

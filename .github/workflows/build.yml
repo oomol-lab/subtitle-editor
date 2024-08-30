@@ -1,0 +1,32 @@
+name: Check Project
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm 📦
+
+      - name: Install dependencies 📦
+        run: pnpm i
+
+      - name: Check
+        run: pnpm ts-check
+
+      - name: Build Editor 🔧
+        run: pnpm run build
+        working-directory: packages/editor
+
+      - name: Build App 🔧
+        run: pnpm run build
+        working-directory: packages/app

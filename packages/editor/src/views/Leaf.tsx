@@ -1,4 +1,4 @@
-import styles from "./Leaf.module.css";
+import styles from "./Leaf.module.less";
 import React from "react";
 import cls from "classnames";
 
