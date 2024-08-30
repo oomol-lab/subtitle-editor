@@ -4,6 +4,9 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "ts-check": "pnpm recursive run ts-check"
+  },
   "devDependencies": {
     "@types/node": "^20.12.7",
     "react": "^18.2.0",

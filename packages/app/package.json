@@ -3,6 +3,7 @@
   "scripts": {
     "start": "NODE_ENV=development electron lib/main/index.mjs",
     "dev": "vite build --watch --mode development",
+    "ts-check": "tsc --noEmit",
     "build": "pnpm build:main && pnpm build:browser",
     "build:main": "rimraf lib/main && tsup",
     "build:browser": "vite build"
