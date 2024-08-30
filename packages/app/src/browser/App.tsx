@@ -7,6 +7,7 @@ import { SrtEditor, SrtEditorView, SrtAudioView } from "srt-editor";
 
 export default () => {
   const [srtEditor, setSrtEditor] = React.useState<SrtEditor | null>(null);
+  const [srtFilePath, setSrtFilePath] = React.useState<string>("");
   const onCollectedFiles: FileSelectorProps["onCollectedFiles"] = React.useCallback(
     async ({ audioFilePath, srtFilePath }) => {
       try {
@@ -14,11 +15,12 @@ export default () => {
         const srtJSON = JSON.parse(srtContent);
         const srtEditor = new SrtEditor(audioFilePath, srtJSON);
         setSrtEditor(srtEditor);
+        setSrtFilePath(srtFilePath);
       } catch (error) {
         console.error(error);
       }
     },
-    [setSrtEditor],
+    [setSrtEditor, setSrtFilePath],
   );
   if (srtEditor === null) {
     return <FileSelector onCollectedFiles={onCollectedFiles} />;
@@ -27,7 +29,9 @@ export default () => {
       <div className={styles.main}>
         <header className={styles.header}>
           <SrtAudioView srtEditor={srtEditor} />
-          <PlayerPanel srtEditor={srtEditor} />
+          <PlayerPanel
+            srtEditor={srtEditor}
+            srtFilePath={srtFilePath} />
         </header>
         <SrtEditorView
           className={styles.editor}

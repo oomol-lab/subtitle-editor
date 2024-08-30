@@ -1,5 +1,6 @@
 import { load } from "js-yaml";
 import { SrtLine, toSrtLines } from "srt-editor";
+import { getExtName } from "./utils";
 
 export async function parseSrtFilePath(path: string): Promise<SrtLine[]> {
   switch (getExtName(path).toLocaleLowerCase()) {
@@ -19,14 +20,5 @@ export async function parseSrtFilePath(path: string): Promise<SrtLine[]> {
     default: {
       throw new Error(`Unsupported file type: ${path}`);
     }
-  }
-}
-
-function getExtName(path: string): string {
-  const pathCells = path.split(".");
-  if (pathCells.length > 0) {
-    return pathCells[pathCells.length - 1];
-  } else {
-    return "";
   }
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import SavePanel from "./SavePanel";
 import styles from "./PlayerPanel.module.less";
 
 import { Button, Checkbox, Select } from "antd";
@@ -9,10 +10,11 @@ import { Val } from "value-enhancer";
 import { SrtEditor, PlayerState } from "srt-editor";
 
 export type PlayerPanelProps = {
+    readonly srtFilePath: string;
     readonly srtEditor: SrtEditor;
 }
 
-const PlayerPanel = ({ srtEditor }: PlayerPanelProps): React.ReactNode => {
+const PlayerPanel = ({ srtEditor, srtFilePath }: PlayerPanelProps): React.ReactNode => {
     const rateList = React.useMemo(() => [0.1, 0.25, 0.5, 0.75, 0.8, 1.0, 1.5, 2.0, 3.0, 4.0, 10.0], []);
     const willAlwaysPlay = useVal(srtEditor.$.willAlwaysPlay);
     const playerState = useVal(srtEditor.$.panelPlayState);
@@ -51,33 +53,39 @@ const PlayerPanel = ({ srtEditor }: PlayerPanelProps): React.ReactNode => {
     }
     return (
         <div className={styles.container}>
-            <Button
-                className={styles.field}
-                shape="circle"
-                disabled={disabled}
-                icon={showPauseIcon ? <PauseOutlined /> : <CaretRightOutlined />}
-                onClick={onClickPlayOrPause} />
-            <Checkbox
-                className={styles.field}
-                checked={willAlwaysPlay}
-                onChange={onAlwaysPlayChanged}>
-                always play
-            </Checkbox>
-            <label className={styles.field}>
-                <span>zoom</span>
-                <SelectPercent
-                    initValue={SrtEditor.zoomInitValue}
-                    value$={srtEditor.$.zoom}
-                    rateList={rateList}
-                    reverse/>
-            </label>
-            <label className={styles.field}>
-                <span>volume</span>
-                <SelectPercent
-                    initValue={SrtEditor.volumeInitValue}
-                    value$={srtEditor.$.volume}
-                    rateList={rateList} />
-            </label>
+            <div className={styles.left}>
+                <Button
+                    className={styles.field}
+                    shape="circle"
+                    disabled={disabled}
+                    icon={showPauseIcon ? <PauseOutlined /> : <CaretRightOutlined />}
+                    onClick={onClickPlayOrPause} />
+                <Checkbox
+                    className={styles.field}
+                    checked={willAlwaysPlay}
+                    onChange={onAlwaysPlayChanged}>
+                    always play
+                </Checkbox>
+                <label className={styles.field}>
+                    <span>zoom</span>
+                    <SelectPercent
+                        initValue={SrtEditor.zoomInitValue}
+                        value$={srtEditor.$.zoom}
+                        rateList={rateList}
+                        reverse />
+                </label>
+                <label className={styles.field}>
+                    <span>volume</span>
+                    <SelectPercent
+                        initValue={SrtEditor.volumeInitValue}
+                        value$={srtEditor.$.volume}
+                        rateList={rateList} />
+                </label>
+            </div>
+            <SavePanel
+                className={styles.right}
+                initialPath={srtFilePath}
+                srtEditor={srtEditor} />
         </div>
     );
 };

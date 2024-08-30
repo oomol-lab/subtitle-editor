@@ -76,6 +76,14 @@ export class SrtEditor {
     return this.#player.$;
   }
 
+  public get onEdited(): (() => void) | null {
+    return this.#state.onUpdated;
+  }
+
+  public set onEdited(onEdited: (() => void) | null) {
+    this.#state.onUpdated = onEdited;
+  }
+
   public play(): void {
     this.#player.clickPanelPlay();
   }
