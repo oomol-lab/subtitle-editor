@@ -1,7 +1,7 @@
 import { createEditor, Element } from "slate";
 import { withReact, ReactEditor } from "slate-react";
 import { ReadonlyVal, Val, val, derive } from "value-enhancer";
-import { SrtLine, DocumentState, toSrtLine } from "./document";
+import { toSrtLine, isSrtLines, SrtLine, DocumentState } from "./document";
 import { Player } from "./wave";
 
 export const InnerFieldsKey = Symbol("InnerFieldsKey");
@@ -43,12 +43,15 @@ export class SrtEditor {
 
   #initialElements: Element[] | null;
 
-  public constructor(audioURL: string, fileSegments: readonly SrtLine[]) {
+  public constructor(audioURL: string, srtLines: readonly SrtLine[]) {
+    if (!isSrtLines(srtLines)) {
+      throw new Error("Invalid srtLines");
+    }
     this.#editor = withReact(createEditor());
     this.#state = new DocumentState(this.#editor);
     this.#player = this.#state.bindPlayer(new Player(this.#state));
     this.#audioURL$ = val(audioURL);
-    this.#initialElements = this.#state.loadInitialFileSegments(fileSegments);
+    this.#initialElements = this.#state.loadInitialFileSegments(srtLines);
     this.#inner = {
       $: { audioURL: derive(this.#audioURL$) },
       editor: this.#editor,

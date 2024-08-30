@@ -1,5 +1,6 @@
+import Ajv from "ajv";
+
 import { Element, Text } from "slate";
-import { Validator, Schema } from "jsonschema";
 import { Segment, SegmentLeaf } from "./segment";
 import { Line, LineElement } from "./line";
 import { DocumentState } from "./documentState";
@@ -18,8 +19,8 @@ export type SrtWord = {
 };
 
 export const isSrtLines: (value: unknown) => value is SrtLine[] = (() => {
-    const validator = new Validator();
-    const wordSchema: Schema = {
+    const ajv = new Ajv();
+    const wordSchema = {
         type: "object",
         required: [
             "begin",
@@ -40,7 +41,7 @@ export const isSrtLines: (value: unknown) => value is SrtLine[] = (() => {
             },
         },
     };
-    const schema: Schema = {
+    const schema = {
         type: "array",
         items: {
             type: "object",
@@ -68,9 +69,7 @@ export const isSrtLines: (value: unknown) => value is SrtLine[] = (() => {
             },
         },
     };
-    return (value: unknown): value is SrtLine[] => (
-        validator.validate(value, schema).valid
-    );
+    return ajv.compile(schema);
 })();
 
 export function initElement(state: DocumentState): Element {
