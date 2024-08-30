@@ -8,11 +8,13 @@ export type SrtLine = {
     readonly begin: number;
     readonly end: number;
     readonly text: string;
-    readonly words?: readonly {
-        readonly begin: number;
-        readonly end: number;
-        readonly word: string;
-    }[];
+    readonly words?: readonly SrtWord[];
+};
+
+export type SrtWord = {
+    readonly begin: number;
+    readonly end: number;
+    readonly word: string;
 };
 
 export const isSrtLines: (value: unknown) => value is SrtLine[] = (() => {
@@ -128,4 +130,31 @@ export function toElement(state: DocumentState, { begin, end, text, words }: Srt
         children,
     };
     return element;
+}
+
+export function toSrtLine(element: Element): SrtLine | null {
+    const line = Line.get(element);
+    if (!line) {
+        return null;
+    }
+    const begin = line.$.begin.value;
+    const end = line.$.end.value;
+    const text = line.$.text.value;
+    const words: SrtWord[] = [];
+
+    for (const leaf of element.children) {
+        const segment = Segment.get(leaf);
+        if (segment) {
+            words.push({
+                begin: segment.$.begin.value,
+                end: segment.$.end.value,
+                word: (leaf as SegmentLeaf).text,
+            });
+        }
+    }
+    if (words.length > 0) {
+        return { begin, end, text, words };
+    } else {
+        return { begin, end, text };
+    }
 }

@@ -1,7 +1,7 @@
 import { createEditor, Element } from "slate";
 import { withReact, ReactEditor } from "slate-react";
 import { ReadonlyVal, Val, val, derive } from "value-enhancer";
-import { SrtLine, DocumentState } from "./document";
+import { SrtLine, DocumentState, toSrtLine } from "./document";
 import { Player } from "./wave";
 
 export const InnerFieldsKey = Symbol("InnerFieldsKey");
@@ -39,6 +39,7 @@ export class SrtEditor {
   readonly #state: DocumentState;
   readonly #player: Player;
   readonly #audioURL$: Val<string>;
+  readonly #inner: InnerSrtEditor;
 
   #initialElements: Element[] | null;
 
@@ -48,30 +49,7 @@ export class SrtEditor {
     this.#player = this.#state.bindPlayer(new Player(this.#state));
     this.#audioURL$ = val(audioURL);
     this.#initialElements = this.#state.loadInitialFileSegments(fileSegments);
-  }
-
-  public get $(): SrtEditor$ {
-    return this.#player.$;
-  }
-
-  public get fileSegments(): readonly SrtLine[] {
-    return [];
-  }
-
-  public set fileSegments(segments: readonly SrtLine[]) {
-    this.#editor.insertFragment(segments.map(s => this.#state.toElement(s)));
-  }
-
-  public play(): void {
-    this.#player.clickPanelPlay();
-  }
-
-  public pause(): void {
-    this.#player.clickPause();
-  }
-
-  [InnerFieldsKey](): InnerSrtEditor {
-    return {
+    this.#inner = {
       $: { audioURL: derive(this.#audioURL$) },
       editor: this.#editor,
       state: this.#state,
@@ -84,6 +62,33 @@ export class SrtEditor {
         this.#initialElements = null;
         return elements;
       },
-    }
+    };
+  }
+
+  [InnerFieldsKey](): InnerSrtEditor {
+    return this.#inner;
+  }
+
+  public get $(): SrtEditor$ {
+    return this.#player.$;
+  }
+
+  public play(): void {
+    this.#player.clickPanelPlay();
+  }
+
+  public pause(): void {
+    this.#player.clickPause();
+  }
+
+  public get srtLines(): SrtLine[] {
+    const lines: SrtLine[] = [];
+    this.#editor.children.map((element) => {
+      const line = toSrtLine(element as Element);
+      if (line) {
+        lines.push(line);
+      }
+    });
+    return lines;
   }
 }
