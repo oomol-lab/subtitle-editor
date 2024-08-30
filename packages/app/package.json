@@ -1,11 +1,9 @@
 {
   "name": "srt-editor-app",
+  "main": "lib/main/index.mjs",
   "scripts": {
-    "start": "NODE_ENV=development electron lib/main/index.mjs",
-    "dev": "vite build --watch --mode development",
-    "build": "pnpm build:main && pnpm build:browser",
-    "build:main": "rimraf lib/main && tsup",
-    "build:browser": "vite build"
+    "dev": "electron-vite dev",
+    "build": "electron-vite build"
   },
   "peerDependencies": {
     "react": "*",
@@ -14,6 +12,7 @@
   "devDependencies": {
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
+    "electron-vite": "^2.3.0",
     "rimraf": "^6.0.1"
   },
   "dependencies": {

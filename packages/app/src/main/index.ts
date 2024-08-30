@@ -12,7 +12,7 @@ function createWindow() {
       preload: join(appPath, "lib", "preload", "index.js"),
     },
   });
-  mainWindow.loadFile(join(appPath, "lib", "browser", "index.html"));
+  mainWindow.loadFile(join(appPath, "public", "index.html"));
 
   if (process.env.NODE_ENV === "development") {
     mainWindow.webContents.openDevTools();
