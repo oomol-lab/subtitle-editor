@@ -10,44 +10,44 @@ import { ElementView } from "./Element";
 import { LeafView } from "./Leaf";
 
 export type EditorProps = React.HTMLAttributes<HTMLDivElement> & {
-    readonly inner: InnerSrtEditor;
-    readonly placeholder?: string;
+  readonly inner: InnerSrtEditor;
+  readonly placeholder?: string;
 };
 
 const Editor = (props: EditorProps) => {
-    const { inner, placeholder, ...restProps } = props;
-    const { editor, state } = inner;
-    const renderElement = React.useCallback(
-        (props: RenderElementProps) => <ElementView {...props} />,
-        [],
-    );
-    const renderLeaf = React.useCallback(
-        (props: RenderLeafProps) => <LeafView {...props} />,
-        [],
-    );
-    const onValueChange = React.useCallback(
-        (value: Descendant[]) => state.fireEditorValueUpdating(value),
-        [state],
-    );
-    return (
-        <div
-            {...restProps}
-            ref={state.setEditorRef}
-            className={cls(styles.container, restProps.className)}
-        >
-            <Slate
-                editor={editor}
-                onValueChange={onValueChange}
-                initialValue={inner.getInitialElements}
-            >
-                <Editable
-                    renderElement={renderElement}
-                    renderLeaf={renderLeaf}
-                    placeholder={placeholder}
-                />
-            </Slate>
-        </div>
-    );
+  const { inner, placeholder, ...restProps } = props;
+  const { editor, state } = inner;
+  const renderElement = React.useCallback(
+    (props: RenderElementProps) => <ElementView {...props} />,
+    [],
+  );
+  const renderLeaf = React.useCallback(
+    (props: RenderLeafProps) => <LeafView {...props} />,
+    [],
+  );
+  const onValueChange = React.useCallback(
+    (value: Descendant[]) => state.fireEditorValueUpdating(value),
+    [state],
+  );
+  return (
+    <div
+      {...restProps}
+      ref={state.setEditorRef}
+      className={cls(styles.container, restProps.className)}
+    >
+      <Slate
+        editor={editor}
+        onValueChange={onValueChange}
+        initialValue={inner.getInitialElements}
+      >
+        <Editable
+          renderElement={renderElement}
+          renderLeaf={renderLeaf}
+          placeholder={placeholder}
+        />
+      </Slate>
+    </div>
+  );
 };
 
 export default Editor;
