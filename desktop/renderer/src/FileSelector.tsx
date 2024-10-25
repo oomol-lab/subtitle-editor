@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./FileSelector.module.less";
+import styles from "./FileSelector.module.scss";
 
 export interface FileSelectorProps {
   readonly onCollectedFiles: (files: {

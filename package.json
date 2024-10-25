@@ -12,7 +12,7 @@
     "@types/node": "^20.12.7",
     "chalk": "^5.3.0",
     "execa": "^9.4.1",
-    "less": "^4.2.0"
+    "sass": "^1.80.4"
   },
   "pnpm": {
     "overrides": {

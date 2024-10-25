@@ -6,7 +6,7 @@ import React from "react";
 import { useVal } from "use-value-enhancer";
 import { Line } from "../document";
 import { LinePlayState } from "../wave";
-import styles from "./Element.module.less";
+import styles from "./Element.module.scss";
 
 export const ElementView = (props: RenderElementProps): React.ReactNode => {
   const { attributes, children, element } = props;

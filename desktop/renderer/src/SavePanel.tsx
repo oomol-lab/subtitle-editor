@@ -5,7 +5,7 @@ import React from "react";
 import { useVal } from "use-value-enhancer";
 import { derive, val } from "value-enhancer";
 import { saveToFilePath } from "./fileParser";
-import styles from "./SavePanel.module.less";
+import styles from "./SavePanel.module.scss";
 
 export type SavePanelProps = React.HTMLAttributes<HTMLDivElement> & {
   readonly initialPath: string;

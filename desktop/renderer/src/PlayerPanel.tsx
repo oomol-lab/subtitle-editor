@@ -6,7 +6,7 @@ import { PlayerState, SrtEditor } from "@subtitle/editor";
 import { Button, Checkbox, Select } from "antd";
 import React from "react";
 import { useVal } from "use-value-enhancer";
-import styles from "./PlayerPanel.module.less";
+import styles from "./PlayerPanel.module.scss";
 import SavePanel from "./SavePanel";
 
 interface SelectPercentProps {

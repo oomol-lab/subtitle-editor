@@ -4,7 +4,7 @@ import { parseSrtFilePath } from "../../fileParser";
 import { FileSelector, type FileSelectorProps } from "../../FileSelector";
 import PlayerPanel from "../../PlayerPanel";
 
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 export const Home = () => {
   const [srtEditor, setSrtEditor] = useState<SrtEditor | null>(null);

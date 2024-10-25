@@ -1,3 +1,5 @@
+import crypto from "node:crypto";
+import path from "node:path";
 import { defineConfig } from "vite";
 
 export default defineConfig(({ mode }) => {
@@ -8,11 +10,7 @@ export default defineConfig(({ mode }) => {
       __DEV__: isDEV,
     },
     css: {
-      preprocessorOptions: {
-        less: {
-          math: "always",
-        },
-      },
+      modules: { generateScopedName: createGenerateScopedName() },
     },
     server: {
       port: 7083,
@@ -51,3 +49,29 @@ export default defineConfig(({ mode }) => {
     },
   };
 });
+
+export function createGenerateScopedName() {
+  /**
+   * Cached CSS file hash
+   */
+  const cachedCSSHash = new Map<string, string>();
+
+  function getCSSHash(fileName: string, css: string): string {
+    let hash = cachedCSSHash.get(fileName);
+    if (!hash) {
+      hash = crypto.createHash("md5").update(css).digest("hex").slice(0, 5);
+      cachedCSSHash.set(fileName, hash);
+    }
+    return hash;
+  }
+
+  return function generateScopedName(
+    className: string,
+    fileName: string,
+    css: string,
+  ): string {
+    const moduleName = path.basename(fileName).split(".")[0];
+    const hash = getCSSHash(fileName, css);
+    return `${moduleName}_${className}_${hash}`;
+  };
+}

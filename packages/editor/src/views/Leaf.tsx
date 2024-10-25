@@ -5,7 +5,7 @@ import cls from "classnames";
 import React from "react";
 import { useVal } from "use-value-enhancer";
 import { Segment } from "../document";
-import styles from "./Leaf.module.less";
+import styles from "./Leaf.module.scss";
 
 interface MarkLeafViewProps {
   readonly attributes: RenderLeafProps["attributes"];

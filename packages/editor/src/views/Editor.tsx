@@ -5,7 +5,7 @@ import type { InnerSrtEditor } from "../srt_editor";
 import cls from "classnames";
 import React from "react";
 import { Editable, Slate } from "slate-react";
-import styles from "./Editor.module.less";
+import styles from "./Editor.module.scss";
 import { ElementView } from "./Element";
 import { LeafView } from "./Leaf";
 
