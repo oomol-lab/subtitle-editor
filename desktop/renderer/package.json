@@ -10,8 +10,8 @@
   },
   "type": "module",
   "dependencies": {
-    "@antfu/eslint-config": "overridden",
     "@ant-design/icons": "^5.4.0",
+    "@antfu/eslint-config": "overridden",
     "@eslint-react/eslint-plugin": "overridden",
     "@subtitle/editor": "workspace:*",
     "antd": "^5.20.3",
@@ -21,6 +21,7 @@
     "js-yaml": "^4.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^6.27.0",
     "use-value-enhancer": "^5.0.6",
     "value-enhancer": "^5.4.2"
   },
