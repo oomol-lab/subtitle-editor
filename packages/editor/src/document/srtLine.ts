@@ -1,22 +1,24 @@
+import type { Element, Text } from "slate";
+
+import type { DocumentState } from "./documentState";
+import type { LineElement } from "./line";
+import type { SegmentLeaf } from "./segment";
 import Ajv from "ajv";
+import { Line } from "./line";
+import { Segment } from "./segment";
 
-import { Element, Text } from "slate";
-import { Segment, SegmentLeaf } from "./segment";
-import { Line, LineElement } from "./line";
-import { DocumentState } from "./documentState";
-
-export type SrtLine = {
+export interface SrtLine {
     readonly begin: number;
     readonly end: number;
     readonly text: string;
     readonly words?: readonly SrtWord[];
-};
+}
 
-export type SrtWord = {
+export interface SrtWord {
     readonly begin: number;
     readonly end: number;
     readonly word: string;
-};
+}
 
 export const isSrtLines: (value: unknown) => value is SrtLine[] = (() => {
     const ajv = new Ajv();
@@ -114,7 +116,8 @@ export function toElement(state: DocumentState, { begin, end, text, words }: Srt
                     text: word,
                 };
                 children.push(leaf);
-            } else {
+            }
+            else {
                 plainText.push(text[textIndex]);
                 wordIndex += 1;
             }
@@ -153,7 +156,8 @@ export function toSrtLine(element: Element): SrtLine | null {
     }
     if (words.length > 0) {
         return { begin, end, text, words };
-    } else {
+    }
+    else {
         return { begin, end, text };
     }
 }

@@ -1,24 +1,25 @@
-import { val, derive, combine, Val, ReadonlyVal } from "value-enhancer";
-import { Text, Descendant, Element, Node } from "slate";
-import { Segment, SegmentLeaf } from "./segment";
-import { Player } from "../wave";
-import { DocumentState } from "./documentState";
+import type { Descendant, Element, Node, Text } from "slate";
+import type { ReadonlyVal, Val } from "value-enhancer";
+import type { Player } from "../wave";
+import type { DocumentState } from "./documentState";
+import type { SegmentLeaf } from "./segment";
+import { combine, derive, val } from "value-enhancer";
+import { Segment } from "./segment";
 
-export type Line$ = {
+export interface Line$ {
     readonly text: ReadonlyVal<string>;
     readonly selected: ReadonlyVal<boolean>;
     readonly removed: ReadonlyVal<boolean>;
     readonly begin: ReadonlyVal<number>;
     readonly end: ReadonlyVal<number>;
     readonly displayTimestamp: ReadonlyVal<boolean>;
-};
+}
 
 export type LineElement = Element & {
     readonly ins: Line;
-}
+};
 
 export class Line {
-
     public readonly $: Line$;
 
     readonly #state: DocumentState;
@@ -47,8 +48,8 @@ export class Line {
             displayTimestamp: combine(
                 [this.#begin$, this.#end$],
                 ([begin, end]) => (
-                    begin !== Number.MAX_SAFE_INTEGER &&
-                    end !== Number.MIN_SAFE_INTEGER
+                    begin !== Number.MAX_SAFE_INTEGER
+                    && end !== Number.MIN_SAFE_INTEGER
                 ),
             ),
         });
@@ -129,7 +130,7 @@ export class Line {
         const path = [this.#index];
         const node: LineElement = {
             ins: this,
-            children: this.#children$.value.map(child => {
+            children: this.#children$.value.map((child) => {
                 if (!("text" in child) || Segment.get(child)) {
                     return child;
                 }
@@ -259,13 +260,16 @@ export class Line {
         if (gapDuration >= defaultDuration + 2.0 * defaultOffset) {
             begin = leftBorder + defaultOffset;
             end = begin + defaultDuration;
-        } else if (gapDuration >= defaultDuration) {
+        }
+        else if (gapDuration >= defaultDuration) {
             begin = (gapDuration - defaultDuration) * 0.5;
             end = begin + defaultDuration;
-        } else if (gapDuration >= minDuration) {
+        }
+        else if (gapDuration >= minDuration) {
             begin = leftBorder;
             end = rightBorder;
-        } else {
+        }
+        else {
             const center = (leftBorder + rightBorder) / 2.0;
             begin = center - minDuration / 2.0;
             end = center + minDuration / 2.0;
@@ -273,7 +277,8 @@ export class Line {
             if (begin < 0) {
                 begin = 0;
                 end = minDuration;
-            } else if (end > audioDuration) {
+            }
+            else if (end > audioDuration) {
                 begin = audioDuration - minDuration;
                 end = audioDuration;
             }

@@ -1,26 +1,31 @@
-import slate, { Editor, Element, Point, Node, Range, Span, Text, Path } from "slate";
+import type { EventReceiver } from "remitter";
+import type { Editor, Element, Path, Range, Span, Text } from "slate";
+import type slate from "slate";
 
-import { Remitter, EventReceiver } from "remitter";
-import { compute, derive, ReadonlyVal, val, Val } from "value-enhancer";
+import type { ReadonlyVal, Val } from "value-enhancer";
+import type { Player } from "../wave";
+import type { LineElement } from "./line";
+import type { SrtLine } from "./srtLine";
+import { Remitter } from "remitter";
+import { Node, Point } from "slate";
+import { compute, derive, val } from "value-enhancer";
+import { Line } from "./line";
 import { Segment } from "./segment";
-import { Line, LineElement } from "./line";
-import { SrtLine, initElement, toElement } from "./srtLine";
-import { Player } from "../wave";
+import { initElement, toElement } from "./srtLine";
 
-export type DocumentState$ = {
+export interface DocumentState$ {
     readonly lines: ReadonlyVal<readonly Line[]>;
     readonly highlightSegment: ReadonlyVal<Segment | null>;
     readonly selectedLines: ReadonlyVal<readonly Line[]>;
     readonly firstSelectedTsLine: ReadonlyVal<Line | null>;
-};
+}
 
-export type DocumentEvents = {
+export interface DocumentEvents {
     readonly addedLine: Line;
     readonly removedLine: Line;
-};
+}
 
 export class DocumentState {
-
     public readonly $: DocumentState$;
     public onUpdated: (() => void) | null = null;
 
@@ -50,7 +55,7 @@ export class DocumentState {
     }
 
     #getFirstSelectedTsLine$(): ReadonlyVal<Line | null> {
-        return compute(get => {
+        return compute((get) => {
             let displayLine: Line | null = null;
             for (const line of get(this.#selectedLines$)) {
                 if (get(line.$.displayTimestamp)) {
@@ -157,7 +162,8 @@ export class DocumentState {
                     const subChildren = (child as slate.Element).children;
                     line.fireChildrenMaybeChanged(i, subChildren);
                     previousLines.delete(line);
-                } else {
+                }
+                else {
                     this.#remitter.emit("addedLine", line);
                 }
             }
@@ -206,7 +212,8 @@ export class DocumentState {
                 this.#waitSplitTexts = Segment.splitText(node, position);
                 setTimeout(() => this.#waitSplitTexts = null, 0);
             }
-        } else if (Line.get(node)) {
+        }
+        else if (Line.get(node)) {
             if (position === 1 && this.#lastTextPosition === 0) {
                 // to fix cannot press enter at the beginning of the line.
                 // I don't know why, but it works.
@@ -263,7 +270,8 @@ export class DocumentState {
     #updateAndGetPoints({ anchor, focus }: Range): [Point, Point] {
         if (anchor) {
             this.#lastAnchor = anchor;
-        } else if (this.#lastAnchor) {
+        }
+        else if (this.#lastAnchor) {
             anchor = this.#lastAnchor;
         }
         if (!anchor && !focus) {
@@ -275,7 +283,8 @@ export class DocumentState {
         }
         if (Point.isBefore(anchor, focus)) {
             return [anchor, focus];
-        } else {
+        }
+        else {
             return [focus, anchor];
         }
     }
@@ -292,12 +301,14 @@ export class DocumentState {
                     segment = this.#searchSegment(beforePath!, "lowest");
                 }
             }
-        } else {
+        }
+        else {
             const segmentBegin = this.#searchSegment(begin, "lowest");
             const segmentEnd = this.#searchSegment(end, "lowest");
             if (segmentBegin && segmentEnd && segmentBegin === segmentEnd) {
                 segment = segmentBegin;
-            } else {
+            }
+            else {
                 // select more than one segments, cancel them all
                 segment = null;
             }

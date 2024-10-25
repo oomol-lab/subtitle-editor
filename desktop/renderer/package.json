@@ -1,0 +1,32 @@
+{
+  "name": "renderer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.tsx",
+  "scripts": {
+    "start": "vite serve",
+    "build": "vite build",
+    "ts-check": "tsc --noEmit"
+  },
+  "type": "module",
+  "dependencies": {
+    "@antfu/eslint-config": "overridden",
+    "@ant-design/icons": "^5.4.0",
+    "@eslint-react/eslint-plugin": "overridden",
+    "@subtitle/editor": "workspace:*",
+    "antd": "^5.20.3",
+    "eslint": "overridden",
+    "eslint-plugin-react-hooks": "overridden",
+    "eslint-plugin-react-refresh": "overridden",
+    "js-yaml": "^4.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "use-value-enhancer": "^5.0.6",
+    "value-enhancer": "^5.4.2"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.3.1"
+  }
+}

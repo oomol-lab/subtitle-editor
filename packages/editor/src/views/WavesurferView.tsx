@@ -1,23 +1,23 @@
-import React from "react";
+import type WaveSurfer from "wavesurfer.js";
+import type { Regions } from "wavesurfer.js/dist/plugins/regions.esm.js";
 import WavesurferPlayer from "@wavesurfer/react";
-import WaveSurfer from "wavesurfer.js";
+import React from "react";
 import Minimap from "wavesurfer.js/dist/plugins/minimap.esm.js";
+
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
 
-import type { Regions } from "wavesurfer.js/dist/plugins/regions.esm.js";
-
-export type WavesurferInstances = {
+export interface WavesurferInstances {
     readonly wavesurfer: WaveSurfer;
     readonly regions: Regions;
-};
+}
 
-export type WavesurferProps = {
+export interface WavesurferProps {
     readonly url?: string;
     readonly firstDecode?: (instances: WavesurferInstances) => void;
-};
+}
 
 export const WavesurferView = (props: WavesurferProps) => {
-    const { firstDecode } = props;
+    const { firstDecode, url } = props;
     const regions = React.useMemo(() => RegionsPlugin.create(), []);
     const onDecode = React.useCallback((wavesurfer: WaveSurfer) => {
         const instances: WavesurferInstances = { wavesurfer, regions };
@@ -26,7 +26,8 @@ export const WavesurferView = (props: WavesurferProps) => {
             // I need do it by myself
             try {
                 firstDecode(instances);
-            } catch (error) {
+            }
+            catch (error) {
                 console.error(error);
             }
         }
@@ -37,9 +38,10 @@ export const WavesurferView = (props: WavesurferProps) => {
             waveColor="rgb(200, 0, 200)"
             progressColor="rgb(100, 0, 100)"
             interact={false}
-            url={props.url}
+            url={url}
             onDecode={onDecode}
-            plugins={[ regions, ...createPlugins() ]}/>
+            plugins={[regions, ...createPlugins()]}
+        />
     );
 };
 

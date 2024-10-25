@@ -1,19 +1,19 @@
-import { Text, Node } from "slate";
-import { derive, ReadonlyVal, val, Val } from "value-enhancer";
+import type { Node, Text } from "slate";
+import type { ReadonlyVal, Val } from "value-enhancer";
+import { derive, val } from "value-enhancer";
 
-export type Segment$ = {
+export interface Segment$ {
     readonly selected: ReadonlyVal<boolean>;
     readonly begin: ReadonlyVal<number>;
     readonly end: ReadonlyVal<number>;
     readonly text: ReadonlyVal<string>;
-};
+}
 
 export type SegmentLeaf = Text & {
     readonly ins: Segment;
 };
 
 export class Segment {
-
     public readonly $: Segment$;
 
     readonly #selected$: Val<boolean>;
@@ -70,7 +70,8 @@ export class Segment {
                 ins: rightSegment,
                 text: rightContent,
             };
-        } else {
+        }
+        else {
             left = { ...source, text: leftContext };
             right = { ...source, text: rightContent };
         }

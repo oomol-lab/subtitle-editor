@@ -1,11 +1,29 @@
-import styles from "./Leaf.module.less";
-import React from "react";
+import type { RenderLeafProps } from "slate-react";
+import type { ReadonlyVal } from "value-enhancer";
 import cls from "classnames";
 
-import { ReadonlyVal } from "value-enhancer";
+import React from "react";
 import { useVal } from "use-value-enhancer";
-import { RenderLeafProps } from "slate-react";
 import { Segment } from "../document";
+import styles from "./Leaf.module.less";
+
+interface MarkLeafViewProps {
+    readonly attributes: RenderLeafProps["attributes"];
+    readonly children: RenderLeafProps["children"];
+    readonly selected$: ReadonlyVal<boolean>;
+}
+
+const MarkLeafView = ({ attributes, children, selected$ }: MarkLeafViewProps): React.ReactNode => {
+    const selected = useVal(selected$);
+    return (
+        <span
+            {...attributes}
+            className={cls([styles.mark, selected && styles.mark_selected])}
+        >
+            {children}
+        </span>
+    );
+};
 
 export const LeafView = (props: RenderLeafProps): React.ReactNode => {
     const { leaf, attributes, children } = props;
@@ -14,7 +32,8 @@ export const LeafView = (props: RenderLeafProps): React.ReactNode => {
         return (
             <MarkLeafView
                 attributes={attributes}
-                selected$={segment.$.selected}>
+                selected$={segment.$.selected}
+            >
                 {children}
             </MarkLeafView>
         );
@@ -25,19 +44,3 @@ export const LeafView = (props: RenderLeafProps): React.ReactNode => {
         </span>
     );
 };
-
-type MarkLeafViewProps = {
-    readonly attributes: RenderLeafProps["attributes"];
-    readonly children: RenderLeafProps["children"];
-    readonly selected$: ReadonlyVal<boolean>;
-};
-
-const MarkLeafView = ({ attributes, children, selected$ }: MarkLeafViewProps): React.ReactNode => {
-    const selected = useVal(selected$);
-    return (
-        <span {...attributes}
-            className={cls([styles.mark, selected && styles.mark_selected])}>
-            {children}
-        </span>
-    );
-}

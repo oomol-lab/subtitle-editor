@@ -1,25 +1,30 @@
 {
-  "name": "subtitle-editor",
+  "name": "subtitle",
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "ts-check": "pnpm recursive run ts-check"
+    "start": "node ./scripts/dev.mjs",
+    "build": "pnpm -r --parallel run build",
+    "ts-check": "pnpm -r --parallel run ts-check",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
     "@types/node": "^20.12.7",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "less": "^4.2.0",
-    "rollup-plugin-external-globals": "^0.10.0",
-    "tsup": "^8.2.4",
-    "typescript": "^5.2.2",
-    "vite": "^5.4.2"
+    "chalk": "^5.3.0",
+    "execa": "^9.4.1",
+    "less": "^4.2.0"
   },
   "pnpm": {
+    "overrides": {
+      "@antfu/eslint-config": "3.8.0",
+      "@eslint-react/eslint-plugin": "1.15.0",
+      "eslint": "9.13.0",
+      "eslint-plugin-react-hooks": "5.0.0",
+      "eslint-plugin-react-refresh": "0.4.14"
+    },
     "patchedDependencies": {
       "slate-react@0.107.1": "patches/slate-react@0.107.1.patch"
     }
-  }
+  },
+  "packageManager": "pnpm@9.11.0"
 }

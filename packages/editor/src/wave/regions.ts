@@ -1,7 +1,8 @@
-import { val, combine, derive, Val, ValDisposer } from "value-enhancer";
-import { Region, Regions } from "wavesurfer.js/dist/plugins/regions.esm.js";
+import type { Val, ValDisposer } from "value-enhancer";
+import type { Region, Regions } from "wavesurfer.js/dist/plugins/regions.esm.js";
+import type { DocumentState, Line } from "../document";
 
-import { DocumentState, Line } from "../document";
+import { combine, derive, val } from "value-enhancer";
 import { toMilliseconds, toSeconds } from "./utils";
 
 // to see: https://wavesurfer.xyz/examples/?regions.js
@@ -13,10 +14,11 @@ export function bindRegions(state: DocumentState, regions: Regions): void {
 
     const regionVals: Map<Line, Val<Region | null>> = new Map();
     const region2Lines: Map<Region, Line> = new Map();
-    const editableLine$ = derive(state.$.selectedLines, selectedLines => {
+    const editableLine$ = derive(state.$.selectedLines, (selectedLines) => {
         if (selectedLines.length === 1) {
             return selectedLines[0];
-        } else {
+        }
+        else {
             return null;
         }
     });
@@ -31,11 +33,11 @@ export function bindRegions(state: DocumentState, regions: Regions): void {
         const display$ = combine(
             [line.$.displayTimestamp, line.$.removed],
             ([displayTimestamp, removed]) => (displayTimestamp && !removed),
-        )
+        );
         const disposers: ValDisposer[] = [];
         const region$ = val<Region | null>(null);
 
-        display$.subscribe(display => {
+        display$.subscribe((display) => {
             if (display) {
                 const textDom = createTextDom();
                 const options$ = combine(
@@ -46,10 +48,10 @@ export function bindRegions(state: DocumentState, regions: Regions): void {
                     },
                 );
                 disposers.push(
-                    line.$.text.subscribe(text => {
+                    line.$.text.subscribe((text) => {
                         textDom.textContent = text;
                     }),
-                    options$.reaction(options => {
+                    options$.reaction((options) => {
                         region$.value?.setOptions(options);
                     }),
                 );
@@ -60,8 +62,8 @@ export function bindRegions(state: DocumentState, regions: Regions): void {
                 });
                 region$.set(region);
                 region2Lines.set(region, line);
-
-            } else {
+            }
+            else {
                 const region = region$.value;
 
                 for (const dispose of disposers.splice(0)) {
@@ -101,8 +103,12 @@ export function bindRegions(state: DocumentState, regions: Regions): void {
     }
 
     function regionOptions(
-        begin: number, end: number, selected: boolean,
-        line: Line, editableLine: Line | null, isPlaying: boolean,
+        begin: number,
+        end: number,
+        selected: boolean,
+        line: Line,
+        editableLine: Line | null,
+        isPlaying: boolean,
     ): Parameters<Region["setOptions"]>[0] {
         let color: string;
         let resize = false;
@@ -110,9 +116,11 @@ export function bindRegions(state: DocumentState, regions: Regions): void {
         if (line === editableLine) {
             resize = !isPlaying;
             color = RegionEditableColor;
-        } else if (selected) {
+        }
+        else if (selected) {
             color = RegionSelectedColor;
-        } else {
+        }
+        else {
             color = RegionColor;
         }
         return {

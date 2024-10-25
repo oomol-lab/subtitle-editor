@@ -1,9 +1,11 @@
-import WaveSurfer, { WaveSurferOptions } from "wavesurfer.js";
+import type { ReadonlyVal } from "value-enhancer";
+import type { WaveSurferOptions } from "wavesurfer.js";
 
-import { DocumentState, Line } from "../document";
-import { derive, combine, ReadonlyVal } from "value-enhancer";
+import type WaveSurfer from "wavesurfer.js";
+import type { DocumentState } from "../document";
+import type { Player } from "./player";
+import { combine } from "value-enhancer";
 import { toSeconds } from "./utils";
-import { Player } from "./player";
 
 export function bindWavesurfer(state: DocumentState, player: Player, wavesurfer: WaveSurfer): void {
     const options$: ReadonlyVal<Partial<WaveSurferOptions>> = combine(
@@ -12,10 +14,10 @@ export function bindWavesurfer(state: DocumentState, player: Player, wavesurfer:
             barHeight: volume,
         }),
     );
-    player.$.zoom.subscribe(zoom => {
+    player.$.zoom.subscribe((zoom) => {
         wavesurfer.zoom(zoom);
     });
-    state.$.firstSelectedTsLine.subscribe(firstSelectedLine => {
+    state.$.firstSelectedTsLine.subscribe((firstSelectedLine) => {
         if (!firstSelectedLine) {
             return;
         }
@@ -32,7 +34,8 @@ export function bindWavesurfer(state: DocumentState, player: Player, wavesurfer:
             if (scrollEnd < selectedBegin || scrollBegin > selectedEnd) { // not touch
                 wavesurfer.setScrollTime(selectedBegin);
             }
-        } else if (selectedBegin < scrollBegin || selectedEnd > scrollEnd) { // not include
+        }
+        else if (selectedBegin < scrollBegin || selectedEnd > scrollEnd) { // not include
             const time = selectedBegin - (scrollWidth - selectedWidth) * 0.15;
             wavesurfer.setScrollTime(time);
         }

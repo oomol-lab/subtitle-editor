@@ -1,14 +1,16 @@
-import WaveSurfer from "wavesurfer.js";
+import type { ReadonlyVal, Val } from "value-enhancer";
+import type WaveSurfer from "wavesurfer.js";
 
-import { val, combine, derive, Val, ReadonlyVal, compute } from "value-enhancer";
-import { DocumentState, Line } from "../document";
+import type { DocumentState, Line } from "../document";
+import type { SrtEditor$ } from "../srt_editor";
+import { combine, compute, derive, val } from "value-enhancer";
+import { PlayerState, SrtEditor } from "../srt_editor";
 import { toMilliseconds, toSeconds } from "./utils";
-import { PlayerState, SrtEditor, SrtEditor$ } from "../srt_editor";
 
-export type PlayerParams = {
+export interface PlayerParams {
     readonly playingLine$: ReadonlyVal<Line | null>;
     readonly panelPlayState$: ReadonlyVal<PlayerState>;
-};
+}
 
 export enum LinePlayState {
     MarkPlay,
@@ -17,7 +19,6 @@ export enum LinePlayState {
 }
 
 export class Player {
-
     public readonly $: SrtEditor$;
 
     readonly #state: DocumentState;
@@ -50,9 +51,11 @@ export class Player {
                 ([focusedLine, isPlaying]) => {
                     if (!focusedLine) {
                         return PlayerState.Disable;
-                    } else if (isPlaying) {
-                        return PlayerState.Playing
-                    } else {
+                    }
+                    else if (isPlaying) {
+                        return PlayerState.Playing;
+                    }
+                    else {
                         return PlayerState.Paused;
                     }
                 },
@@ -61,7 +64,7 @@ export class Player {
     }
 
     #createFocusedLine$(): ReadonlyVal<Line | null> {
-        return compute(get => {
+        return compute((get) => {
             const selectedLines = get(this.#state.$.selectedLines);
             if (selectedLines.length !== 1) {
                 return null;
@@ -75,16 +78,17 @@ export class Player {
     }
 
     #listenValAndOperate(): void {
-        this.#playingLine$.reaction(playingLine => {
+        this.#playingLine$.reaction((playingLine) => {
             if (playingLine) {
                 const begin = playingLine.$.begin.value;
                 const end = playingLine.$.end.value;
                 this.#play(begin, end);
-            } else {
+            }
+            else {
                 this.#pause();
             }
         });
-        this.#state.$.firstSelectedTsLine.reaction(toSeekLine => {
+        this.#state.$.firstSelectedTsLine.reaction((toSeekLine) => {
             if (toSeekLine) {
                 const time = toSeconds(toSeekLine.$.begin.value);
                 this.#wavesurfer?.setTime(time);
@@ -100,7 +104,7 @@ export class Player {
     }
 
     public clickPlay(line: Line): void {
-        if (this.#focusedLine$.value != line) {
+        if (this.#focusedLine$.value !== line) {
             this.#state.selectWholeLine(line);
         }
         this.#markPlaying$.set(true);
@@ -134,9 +138,11 @@ export class Player {
             ([markPlaying, focusedLine]) => {
                 if (!markPlaying) {
                     return LinePlayState.Free;
-                } else if (focusedLine === line) {
+                }
+                else if (focusedLine === line) {
                     return LinePlayState.MarkPlay;
-                } else {
+                }
+                else {
                     return LinePlayState.Ban;
                 }
             },
@@ -148,7 +154,7 @@ export class Player {
             throw new Error("WaveSurfer is already bound");
         }
         this.#wavesurfer = wavesurfer;
-        this.#wavesurfer.on("timeupdate", currentTime => {
+        this.#wavesurfer.on("timeupdate", (currentTime) => {
             if (currentTime >= this.#stopTime) {
                 this.#pause();
                 if (!this.#willAlwaysPlay$.value) {

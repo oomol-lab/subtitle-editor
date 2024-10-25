@@ -1,12 +1,12 @@
-import styles from "./Element.module.less";
-import React from "react";
+import type { RenderElementProps } from "slate-react";
+import { CaretRightOutlined, ClockCircleOutlined, PauseOutlined } from "@ant-design/icons";
 import cls from "classnames";
 
-import { PauseOutlined, CaretRightOutlined, ClockCircleOutlined } from "@ant-design/icons";
-import { RenderElementProps } from "slate-react";
+import React from "react";
 import { useVal } from "use-value-enhancer";
 import { Line } from "../document";
 import { LinePlayState } from "../wave";
+import styles from "./Element.module.less";
 
 export const ElementView = (props: RenderElementProps): React.ReactNode => {
     const { attributes, children, element } = props;
@@ -17,6 +17,7 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
         throw new Error("invalid element");
     }
     const player = line.player;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const lineState$ = React.useMemo(() => player.lineState$(line), [player]);
     const lineState = useVal(lineState$);
     const displayTimestamp = useVal(line.$.displayTimestamp);
@@ -28,10 +29,11 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
                 attributes.ref(element);
                 line.setRef(element);
             };
-        } else {
+        }
+        else {
             return attributes.ref || line.setRef || (() => void 0);
         }
-
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [attributes.ref, line.setRef]);
 
     const onMouseEnter = React.useCallback(() => setHover(true), [setHover]);
@@ -39,11 +41,14 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
     const onClickPlay = React.useCallback(() => {
         if (!displayTimestamp) {
             line.clickCreateTimestamp();
-        } else if (lineState === LinePlayState.MarkPlay) {
+        }
+        else if (lineState === LinePlayState.MarkPlay) {
             line.player.clickPause();
-        } else {
+        }
+        else {
             line.player.clickPlay(line);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [line, lineState]);
 
     const begin = useVal(line.$.begin);
@@ -72,18 +77,23 @@ export const ElementView = (props: RenderElementProps): React.ReactNode => {
         }
     }
     return (
-        <div {...attributes}
+        <div
+            {...attributes}
             ref={ref}
             className={cls(styles.container, markPlay && styles["mark-play"])}
             onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}>
+            onMouseLeave={onMouseLeave}
+        >
             <div
                 className={styles.head}
-                contentEditable={false}>
+                contentEditable={false}
+            >
+                {/* eslint-disable-next-line react-dom/no-missing-button-type */}
                 <button
                     className={styles.button}
                     style={{ visibility: showButton ? "visible" : "hidden" }}
-                    onClick={onClickPlay}>
+                    onClick={onClickPlay}
+                >
                     {buttonIcon}
                 </button>
                 <div className={styles.timestamp}>
@@ -110,4 +120,4 @@ function formatTimestamp(milliseconds: number): string {
     const formattedMilliseconds = millisecondsRemainder.toString().padStart(3, "0");
 
     return `${formattedHours}:${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
-};
+}
