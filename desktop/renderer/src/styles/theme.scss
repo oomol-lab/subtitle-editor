@@ -1,0 +1,93 @@
+@use "sass:map";
+@import "./colors.scss";
+
+@mixin theme-root {
+  @extend .oomol-colors-root;
+  --brand: var(--blue-6);
+
+  --primary: var(--blue-6);
+  --primary-strong: var(--blue-7);
+  --primary-stronger: var(--blue-8);
+  --primary-weak: var(--blue-5);
+  --primary-weaker: var(--blue-2);
+
+  --danger: var(--red-6);
+  --danger-strong: var(--red-7);
+  --danger-stronger: var(--red-8);
+  --danger-weak: var(--red-5);
+  --danger-weaker: var(--red-2);
+
+  --success: var(--green-6);
+  --success-strong: var(--green-7);
+  --success-stronger: var(--green-8);
+  --success-weak: var(--green-5);
+  --success-weaker: var(--green-2);
+
+  --warning: var(--yellow-6);
+  --warning-strong: var(--yellow-7);
+  --warning-stronger: var(--yellow-8);
+  --warning-weak: var(--yellow-5);
+  --warning-weaker: var(--yellow-2);
+
+  --text: var(--grey-6);
+  --text-strong: var(--grey-8);
+  --text-stronger: var(--grey-12);
+  --text-weak: var(--grey-5);
+  --text-weaker: var(--grey-3);
+
+  --link: var(--blue-6);
+  --link-hover: var(--blue-5);
+  --link-active: var(--blue-7);
+  --link-focus: var(--blue-5);
+  --link-visited: var(--blue-3);
+
+  width: 100%;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  color: var(--text-color);
+  background: var(--background-color);
+}
+
+@mixin theme-light {
+  color-scheme: light;
+
+  --text-color: rgba(0, 0, 0, 0.88);
+  --background-color: #fff;
+  --header-background-color: #fff;
+  --sidebar-background-color: #f6f6f7;
+  --hr-color: rgba(0, 0, 0, 0.12);
+  --inner-bg-color: #fafafa;
+  --notification-right-border: #f3f3f3;
+  --segmented-bg-color: #ecf0f7;
+}
+
+@mixin theme-dark {
+  color-scheme: dark;
+
+  --text-color: rgba(255, 255, 255, 0.85);
+  --background-color: #000000;
+  --header-background-color: #000000;
+  --sidebar-background-color: #1a1a1a;
+  --hr-color: #363636;
+
+  --inner-bg-color: #202020;
+  --notification-right-border: #3b3b3b;
+  --segmented-bg-color: #383838;
+}
+
+@mixin genColors($name, $counter: 0) {
+  @while $counter <= 12 {
+    --#{$name}-#{$counter}: #{map-get($colors, $name + "-" + $counter)};
+    $counter: $counter + 1;
+  }
+}
+
+.oomol-colors-root {
+  @include genColors("blue");
+  @include genColors("grey");
+  @include genColors("green");
+  @include genColors("yellow");
+  @include genColors("red");
+}
