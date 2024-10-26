@@ -1,0 +1,53 @@
+.container {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+  padding: 0 15px 0 20px;
+}
+
+.title {
+  font-size: 1em;
+  font-weight: bold;
+  user-select: none;
+}
+
+.footer {
+  -webkit-app-region: no-drag;
+
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.publish {
+  margin-right: 8px;
+  span {
+    font-size: 12px;
+  }
+}
+
+.login-form {
+  margin-top: 28px;
+}
+
+.login-form-button {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.upload-info-box {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.picture-card {
+  flex-shrink: 0;
+}
+
+.project-description {
+  width: 100%;
+}
