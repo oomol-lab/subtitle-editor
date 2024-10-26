@@ -7,7 +7,6 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import type { OOMOLPrefersColorScheme } from "~/components/ThemeProvider";
 import type { SettingStore } from "~/stores/setting.store";
 import { RoutePath } from "./constants";
 import { Home } from "./Home";
