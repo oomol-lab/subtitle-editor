@@ -1,0 +1,32 @@
+.container {
+  height: 100%;
+  width: 100%;
+  padding: 12px;
+}
+
+.languageSetting {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  height: 10px;
+}
+
+.radioGroup {
+  padding-top: 22px;
+}
+
+.modal {
+  :global(.ant-modal-body) {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+  }
+}
+
+.icon {
+  color: var(--warning);
+  font-size: 24px;
+  margin-right: 6px;
+}
