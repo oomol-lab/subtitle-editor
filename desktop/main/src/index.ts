@@ -7,12 +7,17 @@ const __dirname = path.dirname(__filename);
 
 async function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 1600,
-    height: 1500,
+    width: 960,
+    height: 678,
     show: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.mjs"),
       nodeIntegration: false,
+    },
+    titleBarStyle: "hidden",
+    trafficLightPosition: {
+      x: 13,
+      y: 13,
     },
   });
 
