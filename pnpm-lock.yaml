@@ -10,6 +10,8 @@ overrides:
   eslint: 9.13.0
   eslint-plugin-react-hooks: 5.0.0
   eslint-plugin-react-refresh: 0.4.14
+  value-enhancer: ^5.4.2
+  use-value-enhancer: ^5.0.6
 
 patchedDependencies:
   slate-react@0.107.1:
@@ -44,6 +46,12 @@ importers:
       eslint:
         specifier: 9.13.0
         version: 9.13.0
+      use-value-enhancer:
+        specifier: ^5.0.6
+        version: 5.0.6(react@18.3.1)(value-enhancer@5.5.0)
+      value-enhancer:
+        specifier: ^5.4.2
+        version: 5.5.0
       vite:
         specifier: ^5.4.2
         version: 5.4.10(@types/node@20.17.0)(less@4.2.0)(sass@1.80.4)
@@ -3259,7 +3267,7 @@ packages:
     resolution: {integrity: sha512-iYHGcmrmJ63wD5gbPKhN23c0s3owPE8Hv+20NVpUXsL+WfsikLBMS3Ug1OB4B47JfTEHFZtXVXx6Z2245gvvDQ==}
     peerDependencies:
       react: '>=16'
-      value-enhancer: '5'
+      value-enhancer: ^5.4.2
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}

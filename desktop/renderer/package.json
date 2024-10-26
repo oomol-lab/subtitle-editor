@@ -22,8 +22,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.27.0",
-    "use-value-enhancer": "^5.0.6",
-    "value-enhancer": "^5.4.2"
+    "value-enhancer": "overridden",
+    "use-value-enhancer": "overridden"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
