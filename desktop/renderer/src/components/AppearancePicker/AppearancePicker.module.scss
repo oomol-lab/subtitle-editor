@@ -1,0 +1,56 @@
+.container {
+  > :global(.ant-radio-group) {
+    > :global(.ant-radio-wrapper) {
+      position: relative;
+      border-radius: 4px;
+      padding: 4px;
+
+      > :global(span) {
+        padding: 0;
+      }
+
+      :global(.ant-radio) {
+        margin-top: 9px;
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 75%;
+        border-radius: 4px;
+        transition: border-color 0.4s;
+      }
+
+      &:global(.ant-radio-wrapper-checked),
+      &:hover,
+      &:active {
+        &::after {
+          border: 2px solid #7d7fe9;
+        }
+      }
+
+      &:global(.ant-radio-wrapper-checked) {
+        &::after {
+          border: 2px solid #7d7fe9;
+        }
+      }
+    }
+
+    :global(.ant-radio) {
+      display: none;
+    }
+  }
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  > span {
+    padding-top: 6px;
+  }
+}
