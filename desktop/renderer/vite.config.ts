@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 
 export default defineConfig(({ mode }) => {
@@ -11,6 +12,11 @@ export default defineConfig(({ mode }) => {
     },
     css: {
       modules: { generateScopedName: createGenerateScopedName() },
+    },
+    resolve: {
+      alias: {
+        "~": fileURLToPath(new URL("./src", import.meta.url)),
+      },
     },
     server: {
       port: 7083,
