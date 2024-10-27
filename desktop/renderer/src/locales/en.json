@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "appearance": "Appearance",
+    "chinese": "Chinese",
+    "language": "Language",
+    "theme-light": "Light",
+    "theme-dark": "Dark",
+    "theme-auto": "Auto"
+  }
+}
